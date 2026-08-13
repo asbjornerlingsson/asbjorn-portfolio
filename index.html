@@ -379,7 +379,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #lightbox{position:fixed;inset:0;z-index:800;background:rgba(217,217,217,0.9);display:none;align-items:center;justify-content:center;gap:24px;cursor:pointer}
 #lightbox.visible{display:flex}
 #lightbox-img-wrap{flex:0 0 auto;height:85vh;max-width:calc(100vw - 176px);display:flex;align-items:center;justify-content:center;cursor:default}
-#lightbox-img{width:100%;height:100%;object-fit:contain;cursor:default}
+#lightbox-img-wrap img,#lightbox-img-wrap video,#lightbox-img-wrap iframe{width:100%;height:100%;object-fit:contain;border:none;cursor:default}
 #lightbox-close{position:absolute;top:20px;right:24px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;transition:background 0.15s}
 #lightbox-close svg{width:20px;height:20px}
 #lightbox-close svg line{stroke:#050E08;stroke-width:2.5;transition:stroke 0.15s}
@@ -582,7 +582,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 <div id="lightbox" onclick="closeLB(event)">
   <button id="lightbox-close" onclick="closeLB()"><svg viewBox="0 0 20 20"><line x1="2" y1="2" x2="18" y2="18"/><line x1="18" y1="2" x2="2" y2="18"/></svg></button>
   <button class="lb-arrow" id="lb-left" onclick="lbPrev(event)">&#9664;</button>
-  <div id="lightbox-img-wrap"><img id="lightbox-img" src="" alt=""></div>
+  <div id="lightbox-img-wrap"></div>
   <button class="lb-arrow" id="lb-right" onclick="lbNext(event)">&#9654;</button>
   <div id="lb-counter"></div>
 </div>
@@ -1287,8 +1287,29 @@ function sizeLBGalleryToLargest(){
 function closeLB(e){if(e&&e.target&&e.target.id!=='lightbox'&&!e.target.closest('#lightbox-close'))return;document.getElementById('lightbox').classList.remove('visible');lbOpen=false}
 function lbPrev(e){if(e)e.stopPropagation();if(lbIdx>0){lbIdx--;updLB()}}
 function lbNext(e){if(e)e.stopPropagation();if(lbIdx<lbImgs.length-1){lbIdx++;updLB()}}
+// Renders the current lightbox slide — image, local video, or a
+// YouTube/Vimeo embed — mirroring bmMedia()'s format detection, but without
+// the img's onclick-to-open-lightbox (we're already in it) and with videos
+// set to autoplay since arriving here is itself the "open" action.
+function lbMedia(url){
+  if(isVidUrl(url)){
+    if(url.indexOf('youtube')>-1||url.indexOf('youtu.be')>-1){
+      var eu=url;
+      if(url.indexOf('watch?v=')>-1)eu=url.replace('watch?v=','embed/');
+      if(url.indexOf('youtu.be/')>-1)eu='https://www.youtube.com/embed/'+url.split('youtu.be/')[1];
+      eu+=(eu.indexOf('?')>-1?'&':'?')+'autoplay=1&mute=1';
+      return '<iframe src="'+eu+'" allow="autoplay" allowfullscreen></iframe>';
+    }
+    if(url.indexOf('vimeo')>-1){
+      var vimeoId=url.split('vimeo.com/')[1].split('?')[0].split('/')[0];
+      return '<iframe src="https://player.vimeo.com/video/'+vimeoId+'?autoplay=1&muted=1" allow="autoplay" allowfullscreen></iframe>';
+    }
+    return '<video src="'+url+'" controls autoplay muted playsinline></video>';
+  }
+  return '<img src="'+url+'" alt="">';
+}
 function updLB(){
-  document.getElementById('lightbox-img').src=lbImgs[lbIdx];
+  document.getElementById('lightbox-img-wrap').innerHTML=lbMedia(lbImgs[lbIdx]);
   document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+lbImgs.length;
   document.getElementById('lb-left').classList.toggle('disabled',lbIdx<=0);
   document.getElementById('lb-right').classList.toggle('disabled',lbIdx>=lbImgs.length-1);
