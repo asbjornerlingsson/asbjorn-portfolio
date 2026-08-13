@@ -1311,15 +1311,19 @@ function bmMedia(url,idx,imagesExpr,altText){
       var eu=url;
       if(url.indexOf('watch?v=')>-1)eu=url.replace('watch?v=','embed/');
       if(url.indexOf('youtu.be/')>-1)eu='https://www.youtube.com/embed/'+url.split('youtu.be/')[1];
-      return '<iframe src="'+eu+'" style="width:100%;height:100%;min-height:280px;border:none" allowfullscreen></iframe>';
+      // Browsers only allow autoplay when the video is also muted.
+      eu+=(eu.indexOf('?')>-1?'&':'?')+'autoplay=1&mute=1';
+      return '<iframe src="'+eu+'" style="width:100%;height:100%;min-height:280px;border:none" allow="autoplay" allowfullscreen></iframe>';
     }
     if(url.indexOf('vimeo')>-1){
       // Share links look like vimeo.com/12345?share=copy&fl=sv&fe=ci —
       // strip everything after the numeric ID before building the embed URL.
       var vimeoId=url.split('vimeo.com/')[1].split('?')[0].split('/')[0];
-      return '<iframe src="https://player.vimeo.com/video/'+vimeoId+'" style="width:100%;height:100%;min-height:280px;border:none" allowfullscreen></iframe>';
+      return '<iframe src="https://player.vimeo.com/video/'+vimeoId+'?autoplay=1&muted=1" style="width:100%;height:100%;min-height:280px;border:none" allow="autoplay" allowfullscreen></iframe>';
     }
-    return '<video src="'+url+'" style="width:100%;height:100%;object-fit:contain" controls></video>';
+    // Browsers only allow autoplay when the video is also muted; playsinline
+    // keeps it from forcing fullscreen on mobile the moment it starts.
+    return '<video src="'+url+'" style="width:100%;height:100%;object-fit:contain" controls autoplay muted playsinline></video>';
   }
   return '<img src="'+url+'" alt="'+altText+'" style="width:100%;height:100%;object-fit:contain;cursor:pointer" onclick="openLB('+imagesExpr+','+idx+')">';
 }
