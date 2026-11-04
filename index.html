@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
 <title>Ásbjörn Erlingsson — Portfolio</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Share+Tech+Mono&family=VT323&display=swap');
 
 *{margin:0;padding:0;box-sizing:border-box}
 
@@ -98,14 +98,14 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 /* Dialog box */
 #dialog-box{
   position:fixed;left:50%;transform:translateX(-50%);
-  width:min(640px,94vw);background:#fbfbfb;
+  width:min(680px,94vw);background:#fbfbfb;
   border:0;padding:calc(20px + 20px * var(--rs)) calc(22px + 18px * var(--rs));
   z-index:150;opacity:0;pointer-events:none;transition:opacity 0.25s;
 }
 #dialog-box.visible{opacity:1;pointer-events:all}
 .dialog-header{font-family:'Share Tech Mono',monospace;font-size:calc(22px + 4px * var(--rs));font-weight:bold;color:#050E08;margin-bottom:calc(14px + 2px * var(--rs));letter-spacing:0;border-bottom:none;padding-bottom:0;text-shadow:none}
-.dialog-content{font-family:'Share Tech Mono',monospace;font-size:calc(12px + 4px * var(--rs));font-weight:normal;line-height:1.5;color:#050E08}
-.dialog-content span{color:#555!important}
+.dialog-content{font-family:'Share Tech Mono',monospace;font-size:calc(16px + 3px * var(--rs));font-weight:normal;line-height:1.6;color:#050E08}
+.dialog-content span{color:#444!important}
 .dialog-hint{display:none}
 
 /* Project popup */
@@ -127,9 +127,9 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .popup-close:hover svg line{stroke:#fbfbfb}
 .popup-close:hover{color:#fff}
 .popup-title{font-family:'Share Tech Mono',monospace;font-size:calc(22px + 4px * var(--rs));font-weight:bold;color:#050E08;margin-bottom:calc(14px + 2px * var(--rs));letter-spacing:0;text-transform:uppercase}
-.popup-what-label,.popup-how-label{font-family:'Share Tech Mono',monospace;font-size:calc(14px + 2px * var(--rs));font-weight:bold;color:#050E08;margin-top:0;margin-bottom:8px;letter-spacing:0}
+.popup-what-label,.popup-how-label{font-family:'Share Tech Mono',monospace;font-size:calc(15px + 2px * var(--rs));font-weight:bold;color:#050E08;margin-top:0;margin-bottom:8px;letter-spacing:0}
 .popup-how-label{margin-top:24px}
-.popup-what,.popup-how{font-family:'Share Tech Mono',monospace;font-size:calc(14px + 2px * var(--rs));font-weight:normal;line-height:1.5;color:#050E08;margin-bottom:24px;max-width:720px}
+.popup-what,.popup-how{font-family:'Share Tech Mono',monospace;font-size:calc(16px + 3px * var(--rs));font-weight:normal;line-height:1.6;color:#050E08;margin-bottom:24px;max-width:720px}
 .popup-tags{display:none}
 .popup-tag{display:none}
 .popup-see-more{
@@ -195,108 +195,71 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #browse-mode::-webkit-scrollbar{width:6px}
 #browse-mode::-webkit-scrollbar-track{background:var(--pip-bg)}
 #browse-mode::-webkit-scrollbar-thumb{background:var(--pip-dim);border-radius:3px}
+/* ==============================
+   BROWSE MODE — editorial layout
+   ============================== */
+#browse-mode{
+  --ink:#121315;--muted:#5f636a;--line:#e6e6e9;--surface:#f4f4f5;
+  --accent:#FF2889;--accent-ink:#c40f63;
+  font-family:'Inter',Helvetica,Arial,sans-serif;color:var(--ink);
+  scroll-behavior:smooth;-webkit-user-select:text;user-select:text;
+}
+#browse-mode.modal-open{overflow:hidden}
+#browse-mode ::selection{background:var(--accent);color:#fff}
+#browse-mode a{color:inherit}
+#browse-mode :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#browse-modal:focus{outline:none}
 
-.browse-card-overlay{
-  position:absolute;inset:0;background:rgba(0,0,0,0);
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.2s;pointer-events:none;
-}
-.browse-card-overlay span{
-  color:#fff;font-family:'Share Tech Mono',monospace;font-size:20px;
-  text-align:center;padding:0 24px;opacity:0;transition:opacity 0.2s;
-}
-.browse-card:hover .browse-card-overlay{background:rgba(0,0,0,0.8)}
-.browse-card:hover .browse-card-overlay span{opacity:1}
+.bw{max-width:1160px;margin:0 auto;padding:120px 40px 56px}
+.bw-eyebrow{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:2px;color:var(--accent-ink);text-transform:uppercase}
+.bw-name{font-size:clamp(44px,7.5vw,88px);font-weight:800;letter-spacing:-0.035em;line-height:0.98;margin:18px 0 22px}
+.bw-roles{font-size:clamp(20px,2.6vw,28px);font-weight:500;line-height:1.35;letter-spacing:-0.01em}
+.bw-roles span{color:var(--accent);padding:0 4px}
+.bw-lede{font-size:18px;line-height:1.65;color:var(--muted);max-width:620px;margin-top:20px}
+.bw-nav{display:flex;flex-wrap:wrap;gap:10px;margin-top:36px}
+.bw-nav a{font-size:15px;font-weight:600;text-decoration:none;padding:10px 20px;border:1.5px solid var(--ink);border-radius:999px;transition:background .15s,color .15s}
+.bw-nav a:hover{background:var(--ink);color:#fff}
 
-/* CRT overlay for browse mode too */
-#browse-crt{display:none}
-#browse-crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.4) 100%)}
+.bw-section{padding-top:104px;scroll-margin-top:16px}
+.bw-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1.5px solid var(--ink);padding-bottom:14px;margin-bottom:40px}
+.bw-section-title{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-0.02em}
+.bw-count{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--muted)}
 
-.browse-inner{
-  max-width:680px;margin:0 auto;padding:60px 24px 100px;
-}
+.bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:56px 32px}
+.bw-card{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:20px;cursor:pointer;min-width:0}
+.bw-card-media{aspect-ratio:4/3;background:var(--surface);border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:28px;transition:box-shadow .2s}
+.bw-card-media img{width:100%;height:100%;object-fit:contain;transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.bw-card:hover .bw-card-media,.bw-card:focus-visible .bw-card-media{box-shadow:0 0 0 2px var(--accent)}
+.bw-card:hover .bw-card-media img,.bw-card:focus-visible .bw-card-media img{transform:scale(1.045)}
+#browse-mode .bw-card:focus-visible{outline:none}
+.bw-card-title{font-size:21px;font-weight:700;letter-spacing:-0.015em;display:flex;justify-content:space-between;gap:12px}
+.bw-card-title::after{content:'\2192';color:var(--accent);transition:transform .2s}
+.bw-card:hover .bw-card-title::after{transform:translateX(4px)}
+.bw-card-what{font-size:15px;line-height:1.55;color:var(--muted);margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bw-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.bw-tag{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.5px;padding:4px 10px;border-radius:999px;background:var(--surface);color:var(--ink)}
 
-.browse-header{
-  border-bottom:1.5px solid var(--pip-dim);
-  padding-bottom:24px;margin-bottom:40px;
-}
-.browse-name{
-  font-family:'VT323',monospace;font-size:38px;
-  color:var(--pip);letter-spacing:3px;
-  text-shadow:0 0 15px var(--pip);text-transform:uppercase;
-}
-.browse-role{
-  font-family:'Share Tech Mono',monospace;font-size:14px;
-  color:var(--pip-dim);margin-top:4px;letter-spacing:2px;
-}
-.browse-toggle-back{
-  font-family:'VT323',monospace;font-size:14px;
-  color:var(--pip);border:1px solid var(--pip-dim);
-  padding:4px 14px;background:transparent;cursor:pointer;
-  letter-spacing:1px;margin-top:16px;transition:all 0.2s;
-  -webkit-tap-highlight-color:transparent;
-}
-.browse-toggle-back:hover{background:var(--pip);color:var(--pip-bg)}
+.bw-about{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:72px;align-items:start}
+.bw-about-title{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-0.02em;margin-bottom:18px}
+.bw-about p{font-size:19px;line-height:1.7}
+.bw-about p+p{margin-top:16px}
+.bw-contact{list-style:none;border-top:1.5px solid var(--ink)}
+.bw-contact li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);font-size:17px}
+.bw-contact-k{font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.bw-contact a{text-decoration:none;font-weight:600;overflow-wrap:anywhere;text-align:right}
+.bw-contact a:hover{color:var(--accent-ink)}
 
-.browse-section{margin-bottom:40px}
-.browse-section-title{
-  font-family:'VT323',monospace;font-size:22px;
-  color:var(--pip);letter-spacing:2px;
-  text-shadow:0 0 8px var(--pip);
-  border-bottom:1px solid rgba(255,40,137,0.15);
-  padding-bottom:8px;margin-bottom:16px;text-transform:uppercase;
-}
-.browse-about{
-  font-family:'Share Tech Mono',monospace;font-size:14px;
-  line-height:1.9;color:var(--pip);
-}
-.browse-contact-line{color:var(--pip-dim);margin-top:4px}
+.bw-footer{margin-top:104px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.bw-play{all:unset;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--accent-ink)}
+.bw-play:hover{text-decoration:underline}
 
-.browse-project{
-  border:1px solid rgba(255,40,137,0.15);
-  padding:20px;margin-bottom:16px;
-  transition:all 0.2s;cursor:default;
-  background:rgba(255,40,137,0.01);
-}
-.browse-project:hover{
-  border-color:var(--pip);
-  background:rgba(255,40,137,0.04);
-  box-shadow:0 0 15px rgba(255,40,137,0.06);
-}
-.browse-project-title{
-  font-family:'VT323',monospace;font-size:22px;
-  color:var(--pip);letter-spacing:2px;
-  text-shadow:0 0 6px var(--pip);text-transform:uppercase;
-  margin-bottom:12px;
-}
-.browse-project-label{
-  font-family:'VT323',monospace;font-size:14px;
-  color:var(--pip-dim);letter-spacing:1px;margin-top:10px;margin-bottom:4px;
-}
-.browse-project-text{
-  font-family:'Share Tech Mono',monospace;font-size:13px;
-  line-height:1.8;color:var(--pip);
-}
-.browse-project-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.browse-project-tag{
-  font-family:'VT323',monospace;font-size:12px;
-  padding:2px 10px;border:1px solid var(--pip-dim);color:var(--pip-dim);letter-spacing:1px;
-}
-
-.browse-footer{
-  border-top:1.5px solid var(--pip-dim);
-  padding-top:24px;margin-top:20px;
-  text-align:center;
-}
-.browse-footer-text{
-  font-family:'VT323',monospace;font-size:14px;
-  color:var(--pip-dim);letter-spacing:1px;
-}
-
-
-@media(max-width:768px){
-}
-@media(max-width:768px){
+@media(max-width:720px){
+  .bw{padding:112px 20px 40px}
+  .bw-lede{font-size:16px}
+  .bw-section{padding-top:72px}
+  .bw-about{grid-template-columns:1fr;gap:36px}
+  .bw-about p{font-size:17px}
+  .bw-footer{margin-top:72px}
 }
 
 /* Expanded modal layout */
@@ -390,25 +353,34 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .lb-arrow.disabled{color:rgba(5,14,8,0.25);cursor:default}
 .lb-arrow.disabled:hover{background:transparent;color:rgba(5,14,8,0.25)}
 #lb-counter{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:bold;color:rgba(5,14,8,0.6)}
-#browse-modal-backdrop{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center}
+#browse-modal-backdrop{position:fixed;inset:0;z-index:600;background:rgba(10,10,12,0.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:24px}
 #browse-modal-backdrop.visible{display:flex}
-#browse-modal{background:#fbfbfb;border:4px solid #050E08;width:min(1100px,94vw);max-height:85vh;overflow-y:auto;padding:48px;position:relative}
-.bm-close{position:absolute;top:20px;right:20px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;transition:all 0.15s}
-.bm-close svg line{stroke:#050E08;stroke-width:2.5}
-.bm-close:hover{background:#050E08}
-.bm-close:hover svg line{stroke:#fbfbfb}
-.bm-title{font-family:'Share Tech Mono',monospace;font-size:32px;color:#050E08;margin-bottom:32px;text-transform:uppercase}
-.bm-body{display:flex;gap:48px}
-.bm-text{flex:1;min-width:0}
-.bm-label{font-family:'Share Tech Mono',monospace;font-size:16px;color:#050E08;margin-bottom:8px}
-.bm-label+.bm-label{margin-top:24px}
-.bm-desc{font-family:'Share Tech Mono',monospace;font-size:18px;line-height:1.5;color:#050E08;margin-bottom:24px}
-.bm-gallery{flex:0 0 380px;display:flex;flex-direction:column;gap:12px}
-.bm-image-nav{display:flex;align-items:center;gap:8px;height:280px}
-.bm-main-img{flex:1;min-width:0;height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:transparent;cursor:pointer}
-.bm-main-img img{width:100%;height:100%;object-fit:contain}
-@media(max-width:768px){.bm-body{flex-direction:column}.bm-gallery{flex:none;width:100%}}
-
+#browse-modal{background:#fff;border-radius:20px;width:min(1160px,100%);max-height:calc(100vh - 48px);overflow-y:auto;padding:40px;position:relative}
+.bm-close{position:absolute;top:16px;right:16px;z-index:2;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--surface);border:none;transition:background .15s}
+.bm-close svg{width:16px;height:16px}
+.bm-close svg line{stroke:var(--ink);stroke-width:2.5}
+.bm-close:hover{background:var(--ink)}
+.bm-close:hover svg line{stroke:#fff}
+.bm-body{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;align-items:start}
+.bm-main-img{aspect-ratio:4/3;background:var(--surface);border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.bm-main-img img{width:100%;height:100%;object-fit:contain;cursor:zoom-in!important}
+.bm-main-img iframe,.bm-main-img video{width:100%;height:100%;min-height:0!important}
+.bm-gallery-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:16px}
+.bm-nav-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+.bm-nav-btn:hover{background:var(--ink);color:#fff}
+.bm-nav-btn.disabled{opacity:.2;pointer-events:none}
+.bm-counter{font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--muted);min-width:64px;text-align:center}
+.bm-title{font-size:clamp(28px,3.2vw,40px);font-weight:800;letter-spacing:-0.025em;line-height:1.1;padding-right:52px}
+.bm-tags{margin:16px 0 32px}
+.bm-label{font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--accent-ink);margin-bottom:8px}
+.bm-desc{font-size:17px;line-height:1.65;margin-bottom:28px}
+@media(max-width:820px){
+  #browse-modal-backdrop{padding:0;align-items:flex-end}
+  #browse-modal{border-radius:20px 20px 0 0;max-height:92vh;padding:20px 20px 32px}
+  .bm-body{grid-template-columns:1fr;gap:24px}
+  .bm-close{position:sticky;top:0;margin:0 0 -44px auto}
+  .bm-title{padding-right:0}
+}
 </style>
 </head>
 <body>
@@ -528,56 +500,74 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 <!-- ======== BROWSE MODE ======== -->
 <div id="browse-mode">
   <div id="browse-modal-backdrop" onclick="closeBM(event)">
-    <div id="browse-modal">
-      <button class="bm-close" onclick="closeBM()"><svg viewBox="0 0 20 20"><line x1="2" y1="2" x2="18" y2="18"/><line x1="18" y1="2" x2="2" y2="18"/></svg></button>
-      <div class="bm-title" id="bm-title"></div>
+    <div id="browse-modal" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="bm-title">
+      <button class="bm-close" onclick="closeBM()" aria-label="Close"><svg viewBox="0 0 20 20"><line x1="2" y1="2" x2="18" y2="18"/><line x1="18" y1="2" x2="2" y2="18"/></svg></button>
       <div class="bm-body">
-        <div class="bm-text">
-          <div class="bm-label">WHAT?</div>
-          <div class="bm-desc" id="bm-what"></div>
-          <div class="bm-label">HOW?</div>
-          <div class="bm-desc" id="bm-how"></div>
-        </div>
         <div class="bm-gallery">
-          <div class="bm-image-nav">
-            <div class="popup-arrow" id="bm-arrow-left" onclick="prevBM()">&#9664;</div>
-            <div class="bm-main-img" id="bm-main-img"></div>
-            <div class="popup-arrow" id="bm-arrow-right" onclick="nextBM()">&#9654;</div>
+          <div class="bm-main-img" id="bm-main-img"></div>
+          <div class="bm-gallery-nav">
+            <button class="bm-nav-btn" id="bm-arrow-left" onclick="prevBM()" aria-label="Previous image"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="10 3 5 8 10 13"/></svg></button>
+            <span class="bm-counter" id="bm-counter"></span>
+            <button class="bm-nav-btn" id="bm-arrow-right" onclick="nextBM()" aria-label="Next image"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 3 11 8 6 13"/></svg></button>
           </div>
+        </div>
+        <div class="bm-text">
+          <h2 class="bm-title" id="bm-title"></h2>
+          <div class="bw-tags bm-tags" id="bm-tags"></div>
+          <div class="bm-label">What</div>
+          <p class="bm-desc" id="bm-what"></p>
+          <div class="bm-label">How</div>
+          <p class="bm-desc" id="bm-how"></p>
         </div>
       </div>
     </div>
   </div>
-  <div id="browse-crt"></div>
-  <div class="browse-inner" style="max-width:1100px;margin:0 auto;padding:80px 40px 100px;font-family:Helvetica,Arial,sans-serif">
-    
-    <!-- Header -->
-    <div style="margin-bottom:60px">
-      <h1 style="font-size:48px;font-weight:bold;color:#020406;margin-bottom:8px;letter-spacing:-0.5px">Ásbjörn Erlingsson</h1>
-      <p style="font-size:24px;color:#020406;line-height:1.4">Digital Product Designer</p>
-      <p style="font-size:24px;color:#020406;line-height:1.4">The City of Reykjavík</p>
-    </div>
 
-    <!-- Navigation -->
-    <div style="display:flex;gap:0;margin-bottom:60px">
-      <div style="padding:16px 32px;font-size:20px;font-weight:bold;color:#020406;border-bottom:3px solid #020406;cursor:pointer">WORK</div>
-      <div style="padding:16px 32px;font-size:20px;font-weight:bold;color:#3d3d3d;cursor:pointer" onclick="document.getElementById('browse-about-section').scrollIntoView({behavior:'smooth'})">ABOUT ME</div>
-    </div>
+  <div class="bw">
+    <header class="bw-hero">
+      <p class="bw-eyebrow">Player 1 &middot; Portfolio</p>
+      <h1 class="bw-name">Ásbjörn Erlingsson</h1>
+      <p class="bw-roles">UI &amp; product designer<span>/</span>illustrator<span>/</span>game maker</p>
+      <p class="bw-lede">Digital product designer at the City of Reykjavík. I design interfaces, draw the illustrations that go in them, and build small games on the side.</p>
+      <nav class="bw-nav" aria-label="Sections">
+        <a href="#bw-work">Work</a>
+        <a href="#bw-about">About</a>
+        <a href="#bw-about">Contact</a>
+      </nav>
+    </header>
 
-    <!-- Project Grid -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px 85px;margin-bottom:80px" id="browse-project-grid">
-    </div>
-
-    <!-- About Section -->
-    <div id="browse-about-section" style="margin-top:80px;display:flex;gap:80px;align-items:center">
-      <div style="flex:1">
-        <h2 style="font-size:32px;font-weight:bold;color:#020406;margin-bottom:16px">Hi, my name is Ásbjörn!</h2>
-        <p style="font-size:24px;color:#020406;line-height:1.6;margin-bottom:24px">I'm a digital product designer at the Municipality of Reykjavík. I'm also an illustrator, animator and a dabbler in all things digital. I love a challenge; get me a cup of coffee, some new software, and I'll deliver!</p>
-        <p style="font-size:16px;color:#7f7f7f">✉ <a href="mailto:asbjornerlingsson@gmail.com" style="color:inherit">asbjornerlingsson@gmail.com</a></p>
-        <p style="font-size:16px;color:#7f7f7f">☎ 6616443</p>
+    <section class="bw-section" id="bw-work">
+      <div class="bw-section-head">
+        <h2 class="bw-section-title">Selected work</h2>
+        <span class="bw-count" id="bw-count"></span>
       </div>
-    </div>
-  </div></div>
+      <div class="bw-grid" id="browse-project-grid"></div>
+    </section>
+
+    <section class="bw-section" id="bw-about">
+      <div class="bw-section-head">
+        <h2 class="bw-section-title">About</h2>
+      </div>
+      <div class="bw-about">
+        <div>
+          <h3 class="bw-about-title">Hi, my name is Ásbjörn!</h3>
+          <p>I'm a digital product designer at the Municipality of Reykjavík. I'm also an illustrator, animator and a dabbler in all things digital.</p>
+          <p>I love a challenge; get me a cup of coffee, some new software, and I'll deliver!</p>
+        </div>
+        <ul class="bw-contact">
+          <li><span class="bw-contact-k">Email</span><a href="mailto:asbjornerlingsson@gmail.com">asbjornerlingsson@gmail.com</a></li>
+          <li><span class="bw-contact-k">Phone</span><a href="tel:+3546616443">661 6443</a></li>
+          <li><span class="bw-contact-k">Based in</span><span>Reykjavík, Iceland</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="bw-footer">
+      <span>&copy; <span id="bw-year"></span> Ásbjörn Erlingsson</span>
+      <button class="bw-play" onclick="toggleMode()">&#9654; Rather play? Turn game mode on</button>
+    </footer>
+  </div>
+</div>
 
 <div id="lightbox" onclick="closeLB(event)">
   <button id="lightbox-close" onclick="closeLB()"><svg viewBox="0 0 20 20"><line x1="2" y1="2" x2="18" y2="18"/><line x1="18" y1="2" x2="2" y2="18"/></svg></button>
@@ -593,25 +583,6 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 </div>
 
 <script>
-// ============================
-// 8-BIT CHARACTER SPRITE DATA
-// ============================
-// Simple 16x24 pixel art character, drawn procedurally
-const CHAR_W=16,CHAR_H=24;
-const PIXEL=4; // render scale
-
-// Color palette
-const C_SKIN='#FF2889';
-const C_HAIR='#CB226E';
-const C_SHIRT='#FF2889';
-const C_PANTS='#9A1A57';
-const C_SHOES='#7A1445';
-const C_OUTLINE='#5A0E33';
-const C_EYE='#050E08';
-
-// Pixel art frames: each frame is a 16x24 grid
-// 0=transparent, 1=outline, 2=skin, 3=hair, 4=shirt, 5=pants, 6=shoes, 7=eye
-
 // Sign images from Figma (transparent PNGs)
 const signDefaultImg=new Image();
 const signHoverImg=new Image();
@@ -653,92 +624,6 @@ playerIdleImg.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAALQCAYAAAB
 
 
 
-const IDLE_FRAME=[
-  '0000001111000000',
-  '0000013333100000',
-  '0000133333310000',
-  '0000132733310000',
-  '0000133333310000',
-  '0000013333100000',
-  '0000001221000000',
-  '0000114441100000',
-  '0001144444110000',
-  '0011444444411000',
-  '0014444444441000',
-  '0001444444410000',
-  '0000144444100000',
-  '0000144444100000',
-  '0000155555100000',
-  '0000155555100000',
-  '0000155005100000',
-  '0000155005100000',
-  '0000155005100000',
-  '0000166006100000',
-  '0000166006100000',
-  '0000166006100000',
-  '0001166016610000',
-  '0000011001100000',
-];
-
-function makeWalkFrame(legPhase){
-  // Clone idle and modify legs
-  const f=IDLE_FRAME.map(r=>[...r]);
-  // Clear leg area (rows 16-23)
-  for(let y=16;y<24;y++)for(let x=0;x<16;x++)f[y][x]='0';
-
-  if(legPhase===0){
-    // Left forward, right back
-    f[16]='0000155005100000';f[17]='0000155005100000';
-    f[18]='0001550005100000';f[19]='0001660006100000';
-    f[20]='0001660006100000';f[21]='0011660006100000';
-    f[22]='0001110001100000';f[23]='0000000000000000';
-  }else if(legPhase===1){
-    // Contact
-    f[16]='0000155055100000';f[17]='0000155055100000';
-    f[18]='0000155055100000';f[19]='0000166066100000';
-    f[20]='0000166066100000';f[21]='0000166066100000';
-    f[22]='0001166016610000';f[23]='0000011001100000';
-  }else if(legPhase===2){
-    // Right forward, left back
-    f[16]='0000150055000000';f[17]='0000150055000000';
-    f[18]='0000150055100000';f[19]='0000160066100000';
-    f[20]='0000160066100000';f[21]='0000160066110000';
-    f[22]='0000110001110000';f[23]='0000000000000000';
-  }else{
-    // Pass-through
-    f[16]='0000155555100000';f[17]='0000155555100000';
-    f[18]='0000155055100000';f[19]='0000166066100000';
-    f[20]='0000166066100000';f[21]='0000166066100000';
-    f[22]='0001166016610000';f[23]='0000011001100000';
-  }
-  return f.map(r=>typeof r==='string'?r:r.join(''));
-}
-
-const WALK_FRAMES=[makeWalkFrame(0),makeWalkFrame(1),makeWalkFrame(2),makeWalkFrame(3)];
-
-function getColor(c){
-  switch(c){
-    case '1':return C_OUTLINE;case '2':return C_SKIN;case '3':return C_HAIR;
-    case '4':return C_SHIRT;case '5':return C_PANTS;case '6':return C_SHOES;
-    case '7':return C_EYE;default:return null;
-  }
-}
-
-function drawCharFrame(ctx,frame,px,py,scale,flip){
-  ctx.save();
-  if(flip){ctx.translate(px,0);ctx.scale(-1,1);ctx.translate(-px,0)}
-  const ox=px-CHAR_W*scale/2;
-  const oy=py-CHAR_H*scale;
-  for(let y=0;y<CHAR_H;y++){
-    const row=frame[y]||'';
-    for(let x=0;x<CHAR_W;x++){
-      const col=getColor(row[x]);
-      if(col){ctx.fillStyle=col;ctx.fillRect(ox+x*scale,oy+y*scale,scale,scale)}
-    }
-  }
-  ctx.restore();
-}
-
 // ============================
 // ZONES
 // ============================
@@ -749,59 +634,59 @@ const ZONES=[
     xp:50},
   {x:1550,label:'VEITA',type:'project',tab:'work',
     title:'Veita',
-    what:'The merging of financial aid application systems that Reykjavík and SÍS (Icelandic Association of Local Authorities) use.',
-    how:'Through user research the current workflows of the separate financial aid systems was analysed. In order to create a usable and helpful product for both Reykjavík and SÍS, an immensely complicated workflow needed to be simplified and merged with one that was considerably simpler, but mainly suffered from some user interface troubles.',
+    what:'Merging the financial aid application systems used by Reykjavík and SÍS (the Icelandic Association of Local Authorities) into one product.',
+    how:'User research mapped both existing workflows. I simplified a very complex one and merged it with a simpler one whose main problem was its interface.',
     tags:['UX Research','UI Design','Figma','Workflows'],
-    images:['img/veita1.png','img/veita2.png','img/veita3.png','img/veita4.png'],
+    images:['img/veita1.webp','img/veita2.webp','img/veita3.webp','img/veita4.webp'],
     xp:100},
   {x:2100,label:'MENIGA',type:'project',tab:'work',
     title:'Meniga Brand Revamp',
-    what:'Meniga, an Icelandic fintech company, needed to update their illustration library after a brand revitalization.',
-    how:'These were the first illustrations using their new design system. A visual style needed to be developed that fit their design system language.',
+    what:'A new illustration library for Icelandic fintech company Meniga after their rebrand.',
+    how:'The first illustrations made for their new design system, in a visual style I developed to match its language.',
     tags:['Illustration','Branding','Figma','Design System'],
-    images:['img/meniga8.png','img/meniga9.png','img/meniga10.png','img/meniga11.png','img/meniga12.png','img/meniga13.png','img/meniga14.png','img/meniga15.png'],
+    images:['img/meniga8.webp','img/meniga9.webp','img/meniga10.webp','img/meniga11.webp','img/meniga12.webp','img/meniga13.webp','img/meniga14.webp','img/meniga15.webp'],
     xp:100},
   {x:2650,label:'BILINGUALISM',type:'project',tab:'work',
     title:'Bilingualism',
-    what:'A project focusing on how to give bilingual children in Reykjavík the support they need in order to prevent them from lagging behind their peers.',
-    how:'Extensive analysis through interviews, workshops, and testing with experts, teachers, and parents of bilingual children. Results include the establishment of in-school youth mentoring programs and the design of informational websites containing helpful information for bilingual families.',
+    what:'Giving bilingual children in Reykjavík the support they need to keep up with their peers.',
+    how:'Interviews, workshops and testing with experts, teachers and parents. This led to in-school youth mentoring programs and information websites for bilingual families.',
     tags:['UX Research','Service Design','Workshops','Web Design'],
-    images:['img/multi1.png','img/multi2.png','img/multi3.png','img/multi4.png'],
+    images:['img/multi1.webp','img/multi2.webp','img/multi3.webp','img/multi4.webp'],
     xp:100},
   {x:3200,label:'DIGITAL PRODUCTS',type:'project',tab:'work',
     title:'Digital Products',
-    what:"Be it building permit information solutions or in-house asset management systems, there's a broad range of digital products you get to work on for the Municipality of Reykjavík.",
-    how:'POC prototypes, cross-disciplinary teamwork, an infinite amount of back-and-forth with stakeholders and an obscene amount of coffee. A design system that ensures consistent design and development and evolves along with the products and the team.',
+    what:"Building permit tools, in-house asset management and much more for the City of Reykjavík.",
+    how:'Proof-of-concept prototypes, cross-disciplinary teams, endless back-and-forth with stakeholders and an obscene amount of coffee, all held together by a design system that grows with the products.',
     tags:['Product Design','Design Systems','Prototyping','Figma'],
-    images:['img/prod1.png','img/prod2.png','img/prod3.png','img/prod4.png','vid/prod5.mp4'],
+    images:['img/prod1.webp','img/prod2.webp','img/prod3.webp','img/prod4.webp','vid/prod5.mp4'],
     xp:100},
   {x:3750,label:'ILLUSTRATIONS',type:'project',tab:'work',
     title:'Illustrations',
-    what:"Illustrations for all kinds of stuff: childrens' books, youth drug prevention campaigns, personal sale, for fun!",
+    what:"Children's books, youth drug prevention campaigns, commissions and personal work.",
     how:'Adobe Photoshop, Adobe Illustrator, Procreate.',
     tags:['Photoshop','Illustrator','Procreate','Illustration'],
-    images:['img/illustrations1.png','img/illustrations2.png','img/illustrations3.png','img/illustrations4.png','img/illustrations5.png','img/illustrations6.png','img/illustrations7.png','img/illustrations8.png','img/illustrations9.png','img/illustrations10.png','img/illustrations11.png'],
+    images:['img/illustrations1.webp','img/illustrations2.webp','img/illustrations3.webp','img/illustrations4.webp','img/illustrations5.webp','img/illustrations6.webp','img/illustrations7.webp','img/illustrations8.webp','img/illustrations9.webp','img/illustrations10.webp','img/illustrations11.webp'],
     xp:100},
-  {x:4300,label:'OTHER WORKS',type:'project',tab:'work',
-    title:'Other Works',
-    what:"A 2D sidescroller where you jump on sexists' heads instead of Goombas'. A phone app that makes sure that your phone is restless and miserable in any and all positions. A first-person video game where you play either as an arthritic old person or fit young person.",
-    how:'Unity, Pure Data, Blender, Photoshop, and pure stubbornness.',
+  {x:4300,label:'GAMES',type:'project',tab:'work',
+    title:'Games & Experiments',
+    what:"A 2D platformer where you stomp on sexists instead of Goombas. A phone app that keeps your phone restless and miserable in every position. A first-person game you play as either an arthritic old person or a fit young one.",
+    how:'Unity, Pure Data, Blender, Photoshop and pure stubbornness.',
     tags:['Unity','Game Design','Blender','Pure Data'],
-    images:['img/other3.png','https://vimeo.com/330799951?share=copy&fl=sv&fe=ci','https://vimeo.com/1174009421?share=copy&fl=sv&fe=ci','https://vimeo.com/502108393?share=copy&fl=sv&fe=ci','https://www.youtube.com/watch?v=pbdCRVmz6Z4'],
+    images:['img/other3.webp','https://vimeo.com/330799951?share=copy&fl=sv&fe=ci','https://vimeo.com/1174009421?share=copy&fl=sv&fe=ci','https://vimeo.com/502108393?share=copy&fl=sv&fe=ci','https://www.youtube.com/watch?v=pbdCRVmz6Z4'],
     xp:100},
   {x:4850,label:'ODD JOBS',type:'project',tab:'work',
     title:'Odd Jobs',
-    what:'Here and there I get to break up the workday with smaller projects.',
-    how:'Usually these smaller projects require working in graphics software such as Adobe Photoshop, Illustrator, Procreate, and Figma. Some larger projects involve Adobe After Effects. Luckily, not too many of them involve Powerpoint.',
+    what:'Smaller projects that break up the workday.',
+    how:'Photoshop, Illustrator, Procreate and Figma, with After Effects for the bigger ones. Luckily, hardly any PowerPoint.',
     tags:['Photoshop','Illustrator','After Effects','Figma'],
-    images:['img/oddjobs1.png','img/oddjobs2.png','img/oddjobs3.png','https://vimeo.com/1174011231?share=copy&fl=sv&fe=ci','img/oddjobs5.png','img/oddjobs6.png','img/oddjobs7.png','img/oddjobs8.png','img/oddjobs9.png','img/oddjobs10.png','img/oddjobs11.png','img/oddjobs12.png'],
+    images:['img/oddjobs1.webp','img/oddjobs2.webp','img/oddjobs3.webp','https://vimeo.com/1174011231?share=copy&fl=sv&fe=ci','img/oddjobs5.webp','img/oddjobs6.webp','img/oddjobs7.webp','img/oddjobs8.webp','img/oddjobs9.webp','img/oddjobs10.webp','img/oddjobs11.webp','img/oddjobs12.webp'],
     xp:100},
   {x:5400,label:'THE HAPPIEST DAY OF MY LIFE',type:'project',tab:'work',
     title:'The Happiest Day of My Life',
-    what:'My wedding! Full of fun print design tasks that added a touch of color to an already perfect day.',
+    what:'My wedding! Print design that added a touch of colour to an already perfect day.',
     how:'Procreate, InDesign, Illustrator.',
     tags:['Procreate','InDesign','Illustrator','Print Design'],
-    images:['img/wedding1.png','img/wedding2.png','img/wedding3.png','img/wedding4.png','img/wedding5.png','img/wedding6.png','img/wedding7.png','img/wedding8.png'],
+    images:['img/wedding1.webp','img/wedding2.webp','img/wedding3.webp','img/wedding4.webp','img/wedding5.webp','img/wedding6.webp','img/wedding7.webp','img/wedding8.webp'],
     xp:100},
   {x:5950,label:'CONTACT',type:'dialog',tab:'contact',
     header:'CONTACT — Get in Touch',
@@ -809,37 +694,42 @@ const ZONES=[
     xp:50}
 ];
 
-// Populate browse mode projects. Reads images from each zone's images[]
-// array — the same array used by the game-mode gallery — so cards stay
-// in sync between the two modes, and clicking a card opens the browse modal.
+// Populate browse mode projects. Reads each zone's images[] array — the
+// same one the game-mode gallery uses — so both modes stay in sync. A zone
+// can set `cover` to pick its card image; otherwise the first still is used.
 function populateBrowse(){
   var grid=document.getElementById('browse-project-grid');
   if(!grid)return;
   grid.innerHTML='';
-  ZONES.filter(function(z){return z.type==='project'}).forEach(function(z){
-    var card=document.createElement('div');
-    card.className='browse-card';
-    card.style.cssText='background:#f8f8f8;border-radius:16px;height:359px;padding:40px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;overflow:hidden;position:relative';
-
-    var imgs=z.images||[];
-    if(imgs.length>0){
-      card.innerHTML='<img src="'+imgs[0]+'" style="width:100%;height:100%;object-fit:contain" alt="'+z.title+'">';
-    }else{
-      card.innerHTML='<div style="font-family:Share Tech Mono,monospace;font-size:18px;color:#888;text-align:center;padding:20px">'+z.title+'</div>';
+  var projects=ZONES.filter(function(z){return z.type==='project'});
+  var countEl=document.getElementById('bw-count');
+  if(countEl)countEl.textContent=String(projects.length).padStart(2,'0')+' PROJECTS';
+  var yearEl=document.getElementById('bw-year');
+  if(yearEl)yearEl.textContent=new Date().getFullYear();
+  projects.forEach(function(z){
+    var card=document.createElement('button');
+    card.type='button';card.className='bw-card';
+    var media=document.createElement('div');media.className='bw-card-media';
+    var cover=z.cover||(z.images||[]).filter(function(u){return !isVidUrl(u)})[0];
+    if(cover){
+      var img=document.createElement('img');
+      img.src=cover;img.alt='';img.loading='lazy';img.decoding='async';
+      media.appendChild(img);
     }
-
-    var overlay=document.createElement('div');
-    overlay.className='browse-card-overlay';
-    overlay.innerHTML='<span>'+z.title+'</span>';
-    card.appendChild(overlay);
-
-    card.onmouseenter=function(){this.style.transform='scale(1.02)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)'};
-    card.onmouseleave=function(){this.style.transform='scale(1)';this.style.boxShadow='none'};
-    
-    card.onclick=(function(zone){return function(){openBM(zone)}})(z);
-    
+    var body=document.createElement('div');
+    var h=document.createElement('h3');h.className='bw-card-title';h.textContent=z.title;
+    var p=document.createElement('p');p.className='bw-card-what';p.textContent=z.what;
+    body.appendChild(h);body.appendChild(p);body.appendChild(renderTags(z.tags));
+    card.appendChild(media);card.appendChild(body);
+    card.onclick=function(){openBM(z)};
     grid.appendChild(card);
   });
+}
+function renderTags(tags,el){
+  el=el||document.createElement('div');
+  el.classList.add('bw-tags');el.innerHTML='';
+  (tags||[]).forEach(function(t){var s=document.createElement('span');s.className='bw-tag';s.textContent=t;el.appendChild(s)});
+  return el;
 }
 
 // ============================
@@ -857,7 +747,6 @@ function toggleMode(){
     populateBrowse(); // refresh browse mode cards
     closeModeHint();
     document.getElementById('browse-mode').classList.add('active');
-    document.getElementById('browse-crt').classList.add('active');
     document.getElementById('game-mode').classList.add('hidden');
     document.getElementById('intro-overlay').classList.add('hidden');
     gameStarted=true;
@@ -874,7 +763,7 @@ function toggleMode(){
   }else{
     currentMode='game';
     document.getElementById('browse-mode').classList.remove('active');
-    document.getElementById('browse-crt').classList.remove('active');
+    document.getElementById('browse-mode').scrollTop=0;
     document.getElementById('game-mode').classList.remove('hidden');
     document.body.style.overflow='hidden';
     // Switch to on state
@@ -1141,6 +1030,12 @@ function onKeyDown(e){
     closePopup();hideDialog();return;
   }
   if(lbOpen){if(e.key==='ArrowLeft')lbPrev();if(e.key==='ArrowRight')lbNext();return}
+  if(currentMode==='browse'){
+    if(document.getElementById('browse-modal-backdrop').classList.contains('visible')){
+      if(e.key==='ArrowLeft')prevBM();if(e.key==='ArrowRight')nextBM();
+    }
+    return;
+  }
   if(e.key===' '&&player.onGround){player.vy=-10;player.onGround=false}
 }
 function onKeyUp(e){var k=e.key;keys[k]=false;if(k.length===1){keys[k.toLowerCase()]=false;keys[k.toUpperCase()]=false}}
@@ -1354,8 +1249,13 @@ function openBM(z){
   document.getElementById('bm-title').textContent=z.title;
   document.getElementById('bm-what').textContent=z.what;
   document.getElementById('bm-how').textContent=z.how;
+  renderTags(z.tags,document.getElementById('bm-tags'));
   updBM();
+  document.getElementById('browse-modal').scrollTop=0;
   document.getElementById('browse-modal-backdrop').classList.add('visible');
+  document.getElementById('browse-mode').classList.add('modal-open');
+  var sw=document.getElementById('mode-switch');if(sw)sw.style.visibility='hidden';
+  document.getElementById('browse-modal').focus({preventScroll:true});
 }
 function prevBM(){if(bmIdx>0){bmIdx--;updBM()}}
 function nextBM(){var imgs=bmZone.images||[];if(bmIdx<imgs.length-1){bmIdx++;updBM()}}
@@ -1364,17 +1264,23 @@ function updBM(){
   var main=document.getElementById('bm-main-img');
   if(imgs.length===0){
     main.innerHTML='<div style="font-family:Share Tech Mono,monospace;font-size:13px;color:#aaa;padding:20px">Images coming soon</div>';
+    document.getElementById('bm-counter').textContent='';
     document.getElementById('bm-arrow-left').classList.add('disabled');
     document.getElementById('bm-arrow-right').classList.add('disabled');
     return;
   }
   main.innerHTML=bmMedia(imgs[bmIdx],bmIdx);
+  document.getElementById('bm-counter').textContent=(bmIdx+1)+' / '+imgs.length;
   document.getElementById('bm-arrow-left').classList.toggle('disabled',bmIdx<=0);
   document.getElementById('bm-arrow-right').classList.toggle('disabled',bmIdx>=imgs.length-1);
 }
 function closeBM(e){
   if(e&&e.target&&e.target.id!=='browse-modal-backdrop'&&!e.target.closest('.bm-close'))return;
   document.getElementById('browse-modal-backdrop').classList.remove('visible');
+  document.getElementById('browse-mode').classList.remove('modal-open');
+  var sw=document.getElementById('mode-switch');if(sw)sw.style.visibility='';
+  // Stop any playing video/embed when the modal closes.
+  document.getElementById('bm-main-img').innerHTML='';
 }
 
 let activeProjectImages=[];
