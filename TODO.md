@@ -39,3 +39,6 @@
 
 - Trimmed Illustrations and Odd Jobs galleries, removed Bilingualism, deleted the unused images (Nov 5).
 - Text changes from the Nov 4 redesign reviewed and kept.
+- Static version: removed "Player 1 · Portfolio", "Selected work", the project count, the About heading, card arrows and the contact lines; new intro line (Nov 6).
+- New About text without the Municipality of Reykjavík, in both versions (Nov 6).
+- Start screen: role line is now live text, "Digital product designer - Illustrator", matched to the Figma frame (Nov 6).
