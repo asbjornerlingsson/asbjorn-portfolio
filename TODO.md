@@ -3,6 +3,7 @@
 ## Mobile fixes
 
 1. **Show players how to move.** They need to know to press the left and right sides of the screen. (Design the hint, then Claude Code decides when it shows.)
+2. **Don't teleport when tapping a nearby sign.** Clicking or tapping a sign teleports the player to it. If the player is already close enough to the sign, it should just open without the teleport.
 
 ## Static version: design notes
 
