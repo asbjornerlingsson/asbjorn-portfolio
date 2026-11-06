@@ -287,6 +287,16 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .popup-arrow:hover{background:#050E08;color:#fbfbfb}
 .popup-arrow.disabled{color:rgba(5,14,8,0.25);cursor:default}
 .popup-arrow.disabled:hover{background:transparent;color:rgba(5,14,8,0.25)}
+/* Phones: every image is shown in a column you scroll through, instead of
+   one image with arrows. Tapping an image still opens the full-screen view. */
+.popup-image-stack{display:none}
+.popup-image-stack img,.popup-image-stack video{display:block;width:100%;height:auto;cursor:pointer}
+.popup-image-stack iframe{display:block;width:100%;aspect-ratio:16/9;border:none}
+@media(max-width:768px){
+  .popup-image-nav{display:none}
+  .popup-image-stack{display:flex;flex-direction:column;gap:12px}
+  #popup-expanded .popup-expanded-content{gap:20px}
+}
 @media(max-width:768px){
   #popup-expanded .popup-expanded-content{flex-direction:column}
   #popup-expanded .popup-expanded-right{flex:none;width:100%}
@@ -463,6 +473,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
             <div class="popup-image-placeholder" id="popup-image-area"></div>
             <div class="popup-arrow" id="popup-arrow-right" onclick="nextImage()">&#9654;</div>
           </div>
+          <div class="popup-image-stack" id="popup-image-stack"></div>
         </div>
       </div>
       <button class="popup-see-more" onclick="collapseModal()">See less</button>
@@ -920,6 +931,10 @@ function setupTouch(){
     // preventDefault() below swallowed every tap on its buttons, so it
     // could never be closed and the portfolio looked frozen.
     if(lbOpen||e.target.closest('#lightbox'))return;
+    // Buttons on top of the game (the eye-strain hint, the mode switch, the
+    // About/Work/Contact tabs) handle their own taps. preventDefault() below
+    // would otherwise cancel the click and make them impossible to tap.
+    if(e.target.closest('#mode-hint,#mode-switch,#pip-tabs'))return;
 
     // Let intro overlay handle itself
     if(!gameStarted){startGame();e.preventDefault();return}
@@ -934,9 +949,6 @@ function setupTouch(){
       if(dialogOpen)hideDialog();
       return;
     }
-
-    // Don't intercept mode toggle
-    if(e.target.closest('#mode-switch'))return;
 
     e.preventDefault();
 
@@ -1426,6 +1438,33 @@ function updateImageDisplay(){
   document.getElementById('popup-arrow-left').classList.toggle('disabled',currentImageIdx<=0);
   document.getElementById('popup-arrow-right').classList.toggle('disabled',currentImageIdx>=activeProjectImages.length-1);
 }
+// Same breakpoint as the .popup-image-stack CSS.
+var POPUP_STACK_MQ=window.matchMedia('(max-width:768px)');
+// Fills the phone layout's scrolling column with every image and video.
+// Only built on phones, so desktop doesn't load the whole gallery at once.
+// Videos don't autoplay here, since several can be on screen together.
+function renderImageStack(){
+  var stack=document.getElementById('popup-image-stack');
+  if(!stack)return;
+  if(!POPUP_STACK_MQ.matches){stack.innerHTML='';return}
+  stack.innerHTML=activeProjectImages.map(function(url,i){
+    if(isVidUrl(url)){
+      if(url.indexOf('youtube')>-1||url.indexOf('youtu.be')>-1){
+        var eu=url;
+        if(url.indexOf('watch?v=')>-1)eu=url.replace('watch?v=','embed/');
+        if(url.indexOf('youtu.be/')>-1)eu='https://www.youtube.com/embed/'+url.split('youtu.be/')[1];
+        return '<iframe src="'+eu+'" loading="lazy" allowfullscreen></iframe>';
+      }
+      if(url.indexOf('vimeo')>-1){
+        var vimeoId=url.split('vimeo.com/')[1].split('?')[0].split('/')[0];
+        return '<iframe src="https://player.vimeo.com/video/'+vimeoId+'" loading="lazy" allowfullscreen></iframe>';
+      }
+      return '<video src="'+url+'" controls muted playsinline preload="metadata"></video>';
+    }
+    return '<img src="'+url+'" alt="Project image '+(i+1)+'" loading="lazy" onclick="openLB(activeProjectImages,'+i+')">';
+  }).join('');
+}
+POPUP_STACK_MQ.addEventListener('change',function(){if(document.getElementById('project-popup').classList.contains('expanded'))renderImageStack()});
 
 function expandModal(){
   const p=document.getElementById('project-popup');
@@ -1436,10 +1475,13 @@ function expandModal(){
   // Reset image gallery
   currentImageIdx=0;
   updateImageDisplay();
+  renderImageStack();
+  p.scrollTop=0;
 }
 
 function collapseModal(){
   const p=document.getElementById('project-popup');
+  document.getElementById('popup-image-stack').innerHTML='';
   p.querySelector('#popup-collapsed').style.display='';
   p.querySelector('#popup-expanded').style.display='none';
   p.classList.remove('expanded');
@@ -1447,7 +1489,7 @@ function collapseModal(){
   if(activeModalZone)positionModal(p,activeModalZone);
 }
 
-function closePopup(){const p=document.getElementById('project-popup');p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking()}
+function closePopup(){const p=document.getElementById('project-popup');document.getElementById('popup-image-stack').innerHTML='';p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking()}
 
 function updateTabs(zone){
   document.querySelectorAll('.pip-tab').forEach(t=>t.classList.toggle('active',zone&&t.dataset.zone===zone.tab));
