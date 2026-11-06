@@ -11,6 +11,20 @@
    - Allow pinch to zoom and other gestures.
 5. **Show players how to move.** They need to know to press the left and right sides of the screen.
 
+## Static version: design notes
+
+"Static version" = the non-game version of the site (in the code it's called browse mode).
+
+1. **Header design:** revisit the font sizes and the pink slashes in "UI & product designer / illustrator / game maker".
+2. **Category buttons' hover state:** the text becomes unreadable on hover. Fix it.
+3. **Merge the category buttons and the section headers.**
+   - The buttons (Work / About / Contact) act as the section headers.
+   - They stick to the top of the screen while scrolling.
+   - The button for the section you're in switches to a selected state.
+   - This needs detailed design work first.
+4. **Tag pills on project cards:** decide whether to keep them.
+5. **About me and contact section:** look at other portfolios for good ways to design it.
+
 ## 1939 Games application (still open)
 
 - New case study: a mobile game UI concept (design work, Ásbjörn). Claude can draft the brief: screen list, flow and test plan.

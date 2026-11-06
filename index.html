@@ -211,7 +211,6 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #browse-modal:focus{outline:none}
 
 .bw{max-width:1160px;margin:0 auto;padding:120px 40px 56px}
-.bw-eyebrow{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:2px;color:var(--accent-ink);text-transform:uppercase}
 .bw-name{font-size:clamp(44px,7.5vw,88px);font-weight:800;letter-spacing:-0.035em;line-height:0.98;margin:18px 0 22px}
 .bw-roles{font-size:clamp(20px,2.6vw,28px);font-weight:500;line-height:1.35;letter-spacing:-0.01em}
 .bw-roles span{color:var(--accent);padding:0 4px}
@@ -221,9 +220,6 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .bw-nav a:hover{background:var(--ink);color:#fff}
 
 .bw-section{padding-top:104px;scroll-margin-top:16px}
-.bw-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1.5px solid var(--ink);padding-bottom:14px;margin-bottom:40px}
-.bw-section-title{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-0.02em}
-.bw-count{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--muted)}
 
 .bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:56px 32px}
 .bw-card{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:20px;cursor:pointer;min-width:0}
@@ -233,8 +229,6 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .bw-card:hover .bw-card-media img,.bw-card:focus-visible .bw-card-media img{transform:scale(1.045)}
 #browse-mode .bw-card:focus-visible{outline:none}
 .bw-card-title{font-size:21px;font-weight:700;letter-spacing:-0.015em;display:flex;justify-content:space-between;gap:12px}
-.bw-card-title::after{content:'\2192';color:var(--accent);transition:transform .2s}
-.bw-card:hover .bw-card-title::after{transform:translateX(4px)}
 .bw-card-what{font-size:15px;line-height:1.55;color:var(--muted);margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .bw-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .bw-tag{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.5px;padding:4px 10px;border-radius:999px;background:var(--surface);color:var(--ink)}
@@ -243,7 +237,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .bw-about-title{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-0.02em;margin-bottom:18px}
 .bw-about p{font-size:19px;line-height:1.7}
 .bw-about p+p{margin-top:16px}
-.bw-contact{list-style:none;border-top:1.5px solid var(--ink)}
+.bw-contact{list-style:none}
 .bw-contact li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);font-size:17px}
 .bw-contact-k{font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 .bw-contact a{text-decoration:none;font-weight:600;overflow-wrap:anywhere;text-align:right}
@@ -525,10 +519,9 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 
   <div class="bw">
     <header class="bw-hero">
-      <p class="bw-eyebrow">Player 1 &middot; Portfolio</p>
       <h1 class="bw-name">Ásbjörn Erlingsson</h1>
       <p class="bw-roles">UI &amp; product designer<span>/</span>illustrator<span>/</span>game maker</p>
-      <p class="bw-lede">Digital product designer at the City of Reykjavík. I design interfaces, draw the illustrations that go in them, and build small games on the side.</p>
+      <p class="bw-lede">I make interfaces, illustrations and games.</p>
       <nav class="bw-nav" aria-label="Sections">
         <a href="#bw-work">Work</a>
         <a href="#bw-about">About</a>
@@ -536,18 +529,11 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
       </nav>
     </header>
 
-    <section class="bw-section" id="bw-work">
-      <div class="bw-section-head">
-        <h2 class="bw-section-title">Selected work</h2>
-        <span class="bw-count" id="bw-count"></span>
-      </div>
+    <section class="bw-section" id="bw-work" aria-label="Work">
       <div class="bw-grid" id="browse-project-grid"></div>
     </section>
 
-    <section class="bw-section" id="bw-about">
-      <div class="bw-section-head">
-        <h2 class="bw-section-title">About</h2>
-      </div>
+    <section class="bw-section" id="bw-about" aria-label="About">
       <div class="bw-about">
         <div>
           <h3 class="bw-about-title">Hi, my name is Ásbjörn!</h3>
@@ -695,8 +681,6 @@ function populateBrowse(){
   if(!grid)return;
   grid.innerHTML='';
   var projects=ZONES.filter(function(z){return z.type==='project'});
-  var countEl=document.getElementById('bw-count');
-  if(countEl)countEl.textContent=String(projects.length).padStart(2,'0')+' PROJECTS';
   var yearEl=document.getElementById('bw-year');
   if(yearEl)yearEl.textContent=new Date().getFullYear();
   projects.forEach(function(z){
