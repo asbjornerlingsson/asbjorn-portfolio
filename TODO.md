@@ -1,15 +1,9 @@
 # Portfolio to-do
 
-## Mobile fixes (next session)
+## Mobile fixes
 
-1. **Remove jumping on mobile.** It gets in the way of reading the signs.
-2. **Rethink how projects open on mobile.** Try scrolling through the project instead of using the arrows.
-3. **Fix the full-screen image view freezing the portfolio.**
-4. **Make the full-screen view work better on mobile.**
-   - The arrows take up so much space that the images end up too small.
-   - Swipe between images instead of using arrows.
-   - Allow pinch to zoom and other gestures.
-5. **Show players how to move.** They need to know to press the left and right sides of the screen.
+1. **Rethink how projects open on mobile.** Try scrolling through the project instead of using the arrows. (Design first, e.g. in Claude Design.)
+2. **Show players how to move.** They need to know to press the left and right sides of the screen. (Design the hint, then Claude Code decides when it shows.)
 
 ## Static version: design notes
 
@@ -39,3 +33,9 @@
 
 - Trimmed Illustrations and Odd Jobs galleries, removed Bilingualism, deleted the unused images (Nov 5).
 - Text changes from the Nov 4 redesign reviewed and kept.
+- Static version: removed "Player 1 · Portfolio", "Selected work", the project count, the About heading, card arrows and the contact lines; new intro line (Nov 6).
+- New About text without the Municipality of Reykjavík, in both versions (Nov 6).
+- Start screen: role line is now live text, "Digital product designer - Illustrator", matched to the Figma frame (Nov 6).
+- Mobile: no more jumping on tap; each half of the screen walks that way (Nov 6).
+- Fixed the full-screen image view freezing the portfolio in game mode on touch screens (Nov 6).
+- Full-screen view on mobile: image fills the width, arrows moved next to the counter, swipe between images, pinch and double-tap to zoom (Nov 6).
