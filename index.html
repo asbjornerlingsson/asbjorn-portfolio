@@ -402,6 +402,11 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   #browse-modal-backdrop{padding:0;align-items:flex-end}
   #browse-modal{border-radius:20px 20px 0 0;max-height:92vh;padding:20px 20px 32px}
   .bm-body{grid-template-columns:1fr;gap:24px}
+  /* Phones: text first, then every image in a column to scroll through */
+  .bm-text{order:-1}
+  .bm-main-img,.bm-gallery-nav{display:none}
+  .bm-image-stack{display:flex;flex-direction:column;gap:12px}
+  .bm-image-stack img{border-radius:12px;background:var(--surface)}
   .bm-close{position:sticky;top:0;margin:0 0 -44px auto}
   .bm-title{padding-right:0}
 }
@@ -535,6 +540,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
             <span class="bm-counter" id="bm-counter"></span>
             <button class="bm-nav-btn" id="bm-arrow-right" onclick="nextBM()" aria-label="Next image"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 3 11 8 6 13"/></svg></button>
           </div>
+          <div class="popup-image-stack bm-image-stack" id="bm-image-stack"></div>
         </div>
         <div class="bm-text">
           <h2 class="bm-title" id="bm-title"></h2>
@@ -1385,6 +1391,7 @@ function openBM(z){
   document.getElementById('bm-how').textContent=z.how;
   renderTags(z.tags,document.getElementById('bm-tags'));
   updBM();
+  renderBMStack();
   document.getElementById('browse-modal').scrollTop=0;
   document.getElementById('browse-modal-backdrop').classList.add('visible');
   document.getElementById('browse-mode').classList.add('modal-open');
@@ -1403,6 +1410,9 @@ function updBM(){
     document.getElementById('bm-arrow-right').classList.add('disabled');
     return;
   }
+  // Phones use the scrolling column instead; don't load or autoplay a
+  // hidden copy here.
+  if(BM_STACK_MQ.matches){main.innerHTML='';return}
   main.innerHTML=bmMedia(imgs[bmIdx],bmIdx);
   document.getElementById('bm-counter').textContent=(bmIdx+1)+' / '+imgs.length;
   document.getElementById('bm-arrow-left').classList.toggle('disabled',bmIdx<=0);
@@ -1415,6 +1425,7 @@ function closeBM(e){
   var sw=document.getElementById('mode-switch');if(sw)sw.style.visibility='';
   // Stop any playing video/embed when the modal closes.
   document.getElementById('bm-main-img').innerHTML='';
+  document.getElementById('bm-image-stack').innerHTML='';
 }
 
 let activeProjectImages=[];
@@ -1446,8 +1457,12 @@ var POPUP_STACK_MQ=window.matchMedia('(max-width:768px)');
 function renderImageStack(){
   var stack=document.getElementById('popup-image-stack');
   if(!stack)return;
-  if(!POPUP_STACK_MQ.matches){stack.innerHTML='';return}
-  stack.innerHTML=activeProjectImages.map(function(url,i){
+  stack.innerHTML=POPUP_STACK_MQ.matches?imageStackHTML(activeProjectImages,'activeProjectImages'):'';
+}
+// HTML for a column of every image/video in a project. imagesExpr is the JS
+// expression the full-screen view pages through (see bmMedia()).
+function imageStackHTML(images,imagesExpr){
+  return images.map(function(url,i){
     if(isVidUrl(url)){
       if(url.indexOf('youtube')>-1||url.indexOf('youtu.be')>-1){
         var eu=url;
@@ -1461,10 +1476,18 @@ function renderImageStack(){
       }
       return '<video src="'+url+'" controls muted playsinline preload="metadata"></video>';
     }
-    return '<img src="'+url+'" alt="Project image '+(i+1)+'" loading="lazy" onclick="openLB(activeProjectImages,'+i+')">';
+    return '<img src="'+url+'" alt="Project image '+(i+1)+'" loading="lazy" onclick="openLB('+imagesExpr+','+i+')">';
   }).join('');
 }
 POPUP_STACK_MQ.addEventListener('change',function(){if(document.getElementById('project-popup').classList.contains('expanded'))renderImageStack()});
+// Static version: same idea, at its own phone breakpoint (matches the
+// @media(max-width:820px) bottom-sheet layout).
+var BM_STACK_MQ=window.matchMedia('(max-width:820px)');
+function renderBMStack(){
+  var stack=document.getElementById('bm-image-stack');
+  stack.innerHTML=(BM_STACK_MQ.matches&&bmZone)?imageStackHTML(bmZone.images||[],'bmZone.images'):'';
+}
+BM_STACK_MQ.addEventListener('change',function(){if(document.getElementById('browse-modal-backdrop').classList.contains('visible')){renderBMStack();updBM()}});
 
 function expandModal(){
   const p=document.getElementById('project-popup');

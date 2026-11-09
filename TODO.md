@@ -41,3 +41,4 @@
 - Full-screen view on mobile: image fills the width, arrows moved next to the counter, swipe between images, pinch and double-tap to zoom (Nov 6).
 - Mobile: the eye-strain hint's "Got it" button and the About/Work/Contact tabs can be tapped again (Nov 6).
 - Mobile: project popups in game mode show all images in a column you scroll through, instead of one image with arrows (Nov 6).
+- Static version on phones: project text first, then every image in a column you scroll through (Nov 9).
