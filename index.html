@@ -924,8 +924,10 @@ function setupTouch(){
 
   function openZone(z){
     // Move the player to the sign first, just like the bottom-nav tabs do,
-    // instead of popping the dialog open from wherever they're standing.
-    teleportToZone(z);
+    // instead of popping the dialog open from wherever they're standing —
+    // unless they're already standing by it, where a teleport is just a jolt.
+    if(Math.abs(player.x-z.x)>=SIGN_REACH)teleportToZone(z);
+    else updateTabs(z);
     grantZoneXP(z);
     if(z.type==='dialog')showDialog(z);else showProject(z);
   }
@@ -1090,7 +1092,10 @@ function interact(){
   grantZoneXP(z);
   if(z.type==='dialog')showDialog(z);else showProject(z);
 }
-function getNearestZone(){for(const z of ZONES)if(Math.abs(player.x-z.x)<110)return z;return null}
+// How close the player must be to a sign to read it (press E, or tap it
+// without being teleported). Also drives the sign's "near" highlight.
+const SIGN_REACH=110;
+function getNearestZone(){for(const z of ZONES)if(Math.abs(player.x-z.x)<SIGN_REACH)return z;return null}
 
 // Spawns a floating '+XP' popup (Mario-coin-style) at a world position.
 // Rendered as a real DOM element on #xp-popup-layer (z-index above the
@@ -1915,7 +1920,7 @@ function render(){
 function drawSign(zone,gY){
   const x=zone.x-cameraX,W=canvas.width;
   if(x<-200||x>W+200)return;
-  const isNear=Math.abs(player.x-zone.x)<110;
+  const isNear=Math.abs(player.x-zone.x)<SIGN_REACH;
   const visited=visitedZones.has(zone.label);
 
   // Choose sign image based on state
