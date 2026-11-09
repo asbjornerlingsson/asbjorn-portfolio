@@ -206,6 +206,9 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   --ink:#121315;--muted:#5f636a;--line:#e6e6e9;--surface:#f4f4f5;
   font-family:'Inter',Helvetica,Arial,sans-serif;color:var(--ink);
   scroll-behavior:smooth;-webkit-user-select:text;user-select:text;
+  /* No scroll anchoring: when the sticky menu folds and gets shorter, the
+     browser would scroll up to compensate, which un-sticks the menu again. */
+  overflow-anchor:none;
 }
 #browse-mode.modal-open{overflow:hidden}
 #browse-mode ::selection{background:var(--ink);color:#fff}
@@ -239,6 +242,10 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   .bw-menu.is-stuck .bw-tab-ico{width:22px;opacity:1;transform:scale(1) rotate(0);transition:width .42s cubic-bezier(.4,0,.2,1),opacity .2s ease .42s,transform .32s cubic-bezier(.34,1.4,.64,1) .42s}
 }
 @media(prefers-reduced-motion:reduce){.bw-tab,.bw-tab-lbl,.bw-tab-ico{transition:none!important}}
+/* animateMenuFold() measures the before/after layouts with transitions off,
+   then drives the whole fold itself. */
+.bw-menu-inner{position:relative}
+.bw-menu.is-measuring .bw-tab,.bw-menu.is-measuring .bw-tab-lbl,.bw-menu.is-measuring .bw-tab-ico,.bw-menu.is-measuring .bw-menu-inner{transition:none!important}
 
 .bw{max-width:1160px;margin:0 auto;padding:0 40px}
 .bw-section{padding-top:104px;scroll-margin-top:80px}
@@ -793,7 +800,7 @@ function updateBrowseMenu(){
   var bm=document.getElementById('browse-mode'),menu=document.getElementById('bw-menu');
   if(!bm||!menu)return;
   // Measuring only works while the static version is on screen.
-  if(currentMode!=='browse'){placeModeSwitch();return}
+  if(currentMode!=='browse'||!bm.classList.contains('active')){placeModeSwitch();return}
   var active=BW_SECTIONS[0];
   BW_SECTIONS.forEach(function(id){
     var el=document.getElementById(id);
@@ -804,8 +811,105 @@ function updateBrowseMenu(){
   if(bwPickedSection)active=bwPickedSection;
   menu.querySelectorAll('.bw-tab').forEach(function(a){a.setAttribute('aria-current',a.dataset.section===active?'true':'false')});
   var hero=document.getElementById('bw-hero');
-  menu.classList.toggle('is-stuck',!!(hero&&hero.getBoundingClientRect().bottom<=0));
+  setMenuStuck(menu,!!(hero&&hero.getBoundingClientRect().bottom<=0));
   placeModeSwitch();
+}
+// Phones: when the menu sticks, the buttons fold into icons and the three
+// wrapped rows become one. Instead of letting each button reflow on its
+// own (which looks like they hop into place one by one), every button
+// first shrinks to its icon at its final x, then they all rise together
+// into the single row with a little stretch and squash. Unsticking plays
+// the same thing backwards. Desktop never folds, so it just toggles.
+var MENU_FOLD_MQ=window.matchMedia('(max-width:720px)');
+var REDUCED_MOTION_MQ=window.matchMedia('(prefers-reduced-motion: reduce)');
+var menuFoldAnims=[];
+function setMenuStuck(menu,stuck){
+  if(menu.classList.contains('is-stuck')===stuck)return;
+  if(!MENU_FOLD_MQ.matches||REDUCED_MOTION_MQ.matches||!menu.offsetHeight||!menu.animate){
+    menu.classList.toggle('is-stuck',stuck);return;
+  }
+  animateMenuFold(menu,stuck);
+}
+function measureMenu(inner,tabs){
+  var ir=inner.getBoundingClientRect();
+  return {h:ir.height,tabs:tabs.map(function(t){
+    var r=t.getBoundingClientRect(),cs=getComputedStyle(t);
+    return {x:r.left-ir.left,y:r.top-ir.top,w:r.width,pad:cs.paddingLeft,
+      lw:Math.ceil(t.querySelector('.bw-tab-lbl').getBoundingClientRect().width)+1,
+      // Layout width, not the on-screen box (the hidden icon is tilted).
+      iw:t.querySelector('.bw-tab-ico').offsetWidth};
+  })};
+}
+function clearMenuFold(inner,tabs){
+  menuFoldAnims.forEach(function(a){a.cancel()});menuFoldAnims=[];
+  inner.style.height='';
+  tabs.forEach(function(t){t.style.position=t.style.left=t.style.top=t.style.width=t.style.margin=''});
+}
+function animateMenuFold(menu,stuck){
+  var inner=menu.querySelector('.bw-menu-inner');
+  var tabs=Array.prototype.slice.call(inner.querySelectorAll('.bw-tab'));
+  // "Before" is whatever is on screen right now, even mid-animation.
+  var A=measureMenu(inner,tabs);
+  clearMenuFold(inner,tabs);
+  menu.classList.add('is-measuring');
+  menu.classList.toggle('is-stuck',stuck);
+  var B=measureMenu(inner,tabs);
+  menu.dataset.foldH=B.h+(menu.offsetHeight-inner.offsetHeight);
+  placeModeSwitch();
+  // Pin every button at its final spot so changing widths can't reflow
+  // the others while they move.
+  inner.style.height=B.h+'px';
+  tabs.forEach(function(t,i){
+    var b=B.tabs[i];
+    t.style.position='absolute';t.style.margin='0';
+    t.style.left=b.x+'px';t.style.top=b.y+'px';t.style.width=b.w+'px';
+  });
+  void inner.offsetWidth;
+  menu.classList.remove('is-measuring');
+  var D=stuck?780:720;
+  // A liquid curve: quick start, soft landing.
+  var goo='cubic-bezier(.45,0,.2,1)';
+  function run(el,frames){var a=el.animate(frames,{duration:D,fill:'both'});menuFoldAnims.push(a);return a}
+  tabs.forEach(function(t,i){
+    var a=A.tabs[i],b=B.tabs[i],dx=a.x-b.x,dy=a.y-b.y,lift=Math.abs(dy)>1;
+    var lbl=t.querySelector('.bw-tab-lbl'),ico=t.querySelector('.bw-tab-ico');
+    if(stuck){
+      // 1) shrink to the icon at the final x, staying on its old row;
+      // 2) rise into the single row, stretching on the way up and
+      //    squashing slightly as it lands.
+      run(t,[
+        {offset:0,transform:'translate('+dx+'px,'+dy+'px)',width:a.w+'px',paddingLeft:a.pad,paddingRight:a.pad,easing:goo},
+        {offset:.42,transform:'translate(0px,'+dy+'px)',width:b.w+'px',paddingLeft:b.pad,paddingRight:b.pad,easing:'cubic-bezier(.5,0,.6,1)'},
+        {offset:.6,transform:'translate(0px,'+(dy*0.55)+'px) scale('+(lift?'.9,1.12':'1,1')+')',width:b.w+'px',easing:'cubic-bezier(.2,.7,.3,1)'},
+        {offset:.82,transform:'translate(0px,'+(lift?-3:0)+'px) scale('+(lift?'1.07,.93':'1,1')+')',width:b.w+'px',easing:'ease-out'},
+        {offset:1,transform:'translate(0px,0px) scale(1,1)',width:b.w+'px',paddingLeft:b.pad,paddingRight:b.pad}
+      ]);
+      run(lbl,[{maxWidth:a.lw+'px',opacity:1},{offset:.3,opacity:0},{offset:.4,maxWidth:'0px',opacity:0},{maxWidth:'0px',opacity:0}]);
+      run(ico,[{width:a.iw+'px',opacity:0,transform:'scale(.4)'},{offset:.28,width:'22px',opacity:0,transform:'scale(.4)'},{offset:.48,opacity:1,transform:'scale(1.12)'},{offset:.62,transform:'scale(1)'},{width:'22px',opacity:1,transform:'scale(1)'}]);
+    }else{
+      // Backwards: drop to the final row as an icon, then grow the label.
+      run(t,[
+        {offset:0,transform:'translate('+dx+'px,'+dy+'px) scale(1,1)',width:a.w+'px',paddingLeft:a.pad,paddingRight:a.pad,easing:'cubic-bezier(.5,0,.6,1)'},
+        {offset:.25,transform:'translate('+(dx*0.45)+'px,'+(dy*0.45)+'px) scale('+(lift?'.9,1.12':'1,1')+')',easing:'cubic-bezier(.2,.7,.3,1)'},
+        {offset:.48,transform:'translate(0px,'+(lift?3:0)+'px) scale('+(lift?'1.07,.93':'1,1')+')',width:a.w+'px',paddingLeft:a.pad,paddingRight:a.pad,easing:goo},
+        {offset:.58,transform:'translate(0px,0px) scale(1,1)',width:a.w+'px',easing:goo},
+        {offset:1,transform:'translate(0px,0px) scale(1,1)',width:b.w+'px',paddingLeft:b.pad,paddingRight:b.pad}
+      ]);
+      run(ico,[{width:a.iw+'px',opacity:1,transform:'scale(1)'},{offset:.55,width:a.iw+'px',opacity:1,transform:'scale(1)'},{offset:.68,opacity:0,transform:'scale(.5)'},{offset:.8,width:'0px'},{width:'0px',opacity:0,transform:'scale(.5)'}]);
+      run(lbl,[{maxWidth:'0px',opacity:0},{offset:.58,maxWidth:'0px',opacity:0},{offset:.75,opacity:0},{offset:.92,maxWidth:b.lw+'px'},{maxWidth:b.lw+'px',opacity:1}]);
+    }
+  });
+  // The bar's height follows the rows: it shrinks as the buttons rise,
+  // and grows as they drop back down.
+  run(inner,stuck
+    ?[{height:A.h+'px'},{offset:.42,height:A.h+'px',easing:'cubic-bezier(.5,0,.3,1)'},{height:B.h+'px'}]
+    :[{height:A.h+'px',easing:'cubic-bezier(.5,0,.3,1)'},{offset:.5,height:B.h+'px'},{height:B.h+'px'}]);
+  var mine=menuFoldAnims.slice();
+  mine[0].finished.then(function(){
+    if(menuFoldAnims[0]!==mine[0])return; // a newer fold took over
+    delete menu.dataset.foldH;
+    clearMenuFold(inner,tabs);placeModeSwitch();
+  }).catch(function(){});
 }
 // The mode switch keeps its usual spot (40px from the top right) and, once
 // the menu sticks, slides up to sit centred in the sticky bar.
@@ -813,7 +917,9 @@ function placeModeSwitch(){
   var sw=document.getElementById('mode-switch'),menu=document.getElementById('bw-menu');
   if(!sw)return;
   if(currentMode==='browse'&&menu&&menu.offsetHeight&&menu.classList.contains('is-stuck')){
-    sw.style.top=Math.round((menu.offsetHeight-sw.offsetHeight)/2)+'px';
+    // While the menu is folding, aim for the bar's final height.
+    var h=menu.dataset.foldH?+menu.dataset.foldH:menu.offsetHeight;
+    sw.style.top=Math.round((h-sw.offsetHeight)/2)+'px';
   }else sw.style.top='40px';
 }
 (function(){

@@ -38,3 +38,4 @@
 - Static version rebuilt from the Claude Design file: new hero, sticky Interfaces & games / Illustration & designs / About / Contact menu with selected state (icons on phones), work split into two sections, new card hover, separate About and Contact, "This Portfolio" card. The game/static switch stays top right and lines up with the sticky menu (Nov 9).
 - Static version: no tag pills, no pink, What/How as plain subheadings, project sheet's close button no longer hides behind the phone's address bar (Nov 10).
 - Game: player starts near the left edge and says three intro lines on the way to the first sign; the world moved 300px right to make room; long speech bubbles wrap (Nov 10).
+- Static version on phones: the sticky menu folds as one smooth two-step animation (shrink to icons in place, then rise into one row with a stretch and squash), and back (Nov 10).
