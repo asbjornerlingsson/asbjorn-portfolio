@@ -287,6 +287,16 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .popup-arrow:hover{background:#050E08;color:#fbfbfb}
 .popup-arrow.disabled{color:rgba(5,14,8,0.25);cursor:default}
 .popup-arrow.disabled:hover{background:transparent;color:rgba(5,14,8,0.25)}
+/* Phones: every image is shown in a column you scroll through, instead of
+   one image with arrows. Tapping an image still opens the full-screen view. */
+.popup-image-stack{display:none}
+.popup-image-stack img,.popup-image-stack video{display:block;width:100%;height:auto;cursor:pointer}
+.popup-image-stack iframe{display:block;width:100%;aspect-ratio:16/9;border:none}
+@media(max-width:768px){
+  .popup-image-nav{display:none}
+  .popup-image-stack{display:flex;flex-direction:column;gap:12px}
+  #popup-expanded .popup-expanded-content{gap:20px}
+}
 @media(max-width:768px){
   #popup-expanded .popup-expanded-content{flex-direction:column}
   #popup-expanded .popup-expanded-right{flex:none;width:100%}
@@ -392,6 +402,11 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   #browse-modal-backdrop{padding:0;align-items:flex-end}
   #browse-modal{border-radius:20px 20px 0 0;max-height:92vh;padding:20px 20px 32px}
   .bm-body{grid-template-columns:1fr;gap:24px}
+  /* Phones: text first, then every image in a column to scroll through */
+  .bm-text{order:-1}
+  .bm-main-img,.bm-gallery-nav{display:none}
+  .bm-image-stack{display:flex;flex-direction:column;gap:12px}
+  .bm-image-stack img{border-radius:12px;background:var(--surface)}
   .bm-close{position:sticky;top:0;margin:0 0 -44px auto}
   .bm-title{padding-right:0}
 }
@@ -463,6 +478,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
             <div class="popup-image-placeholder" id="popup-image-area"></div>
             <div class="popup-arrow" id="popup-arrow-right" onclick="nextImage()">&#9654;</div>
           </div>
+          <div class="popup-image-stack" id="popup-image-stack"></div>
         </div>
       </div>
       <button class="popup-see-more" onclick="collapseModal()">See less</button>
@@ -524,6 +540,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
             <span class="bm-counter" id="bm-counter"></span>
             <button class="bm-nav-btn" id="bm-arrow-right" onclick="nextBM()" aria-label="Next image"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 3 11 8 6 13"/></svg></button>
           </div>
+          <div class="popup-image-stack bm-image-stack" id="bm-image-stack"></div>
         </div>
         <div class="bm-text">
           <h2 class="bm-title" id="bm-title"></h2>
@@ -907,8 +924,10 @@ function setupTouch(){
 
   function openZone(z){
     // Move the player to the sign first, just like the bottom-nav tabs do,
-    // instead of popping the dialog open from wherever they're standing.
-    teleportToZone(z);
+    // instead of popping the dialog open from wherever they're standing —
+    // unless they're already standing by it, where a teleport is just a jolt.
+    if(Math.abs(player.x-z.x)>=SIGN_REACH)teleportToZone(z);
+    else updateTabs(z);
     grantZoneXP(z);
     if(z.type==='dialog')showDialog(z);else showProject(z);
   }
@@ -920,6 +939,10 @@ function setupTouch(){
     // preventDefault() below swallowed every tap on its buttons, so it
     // could never be closed and the portfolio looked frozen.
     if(lbOpen||e.target.closest('#lightbox'))return;
+    // Buttons on top of the game (the eye-strain hint, the mode switch, the
+    // About/Work/Contact tabs) handle their own taps. preventDefault() below
+    // would otherwise cancel the click and make them impossible to tap.
+    if(e.target.closest('#mode-hint,#mode-switch,#pip-tabs'))return;
 
     // Let intro overlay handle itself
     if(!gameStarted){startGame();e.preventDefault();return}
@@ -934,9 +957,6 @@ function setupTouch(){
       if(dialogOpen)hideDialog();
       return;
     }
-
-    // Don't intercept mode toggle
-    if(e.target.closest('#mode-switch'))return;
 
     e.preventDefault();
 
@@ -1072,7 +1092,10 @@ function interact(){
   grantZoneXP(z);
   if(z.type==='dialog')showDialog(z);else showProject(z);
 }
-function getNearestZone(){for(const z of ZONES)if(Math.abs(player.x-z.x)<110)return z;return null}
+// How close the player must be to a sign to read it (press E, or tap it
+// without being teleported). Also drives the sign's "near" highlight.
+const SIGN_REACH=110;
+function getNearestZone(){for(const z of ZONES)if(Math.abs(player.x-z.x)<SIGN_REACH)return z;return null}
 
 // Spawns a floating '+XP' popup (Mario-coin-style) at a world position.
 // Rendered as a real DOM element on #xp-popup-layer (z-index above the
@@ -1373,6 +1396,7 @@ function openBM(z){
   document.getElementById('bm-how').textContent=z.how;
   renderTags(z.tags,document.getElementById('bm-tags'));
   updBM();
+  renderBMStack();
   document.getElementById('browse-modal').scrollTop=0;
   document.getElementById('browse-modal-backdrop').classList.add('visible');
   document.getElementById('browse-mode').classList.add('modal-open');
@@ -1391,6 +1415,9 @@ function updBM(){
     document.getElementById('bm-arrow-right').classList.add('disabled');
     return;
   }
+  // Phones use the scrolling column instead; don't load or autoplay a
+  // hidden copy here.
+  if(BM_STACK_MQ.matches){main.innerHTML='';return}
   main.innerHTML=bmMedia(imgs[bmIdx],bmIdx);
   document.getElementById('bm-counter').textContent=(bmIdx+1)+' / '+imgs.length;
   document.getElementById('bm-arrow-left').classList.toggle('disabled',bmIdx<=0);
@@ -1403,6 +1430,7 @@ function closeBM(e){
   var sw=document.getElementById('mode-switch');if(sw)sw.style.visibility='';
   // Stop any playing video/embed when the modal closes.
   document.getElementById('bm-main-img').innerHTML='';
+  document.getElementById('bm-image-stack').innerHTML='';
 }
 
 let activeProjectImages=[];
@@ -1426,6 +1454,45 @@ function updateImageDisplay(){
   document.getElementById('popup-arrow-left').classList.toggle('disabled',currentImageIdx<=0);
   document.getElementById('popup-arrow-right').classList.toggle('disabled',currentImageIdx>=activeProjectImages.length-1);
 }
+// Same breakpoint as the .popup-image-stack CSS.
+var POPUP_STACK_MQ=window.matchMedia('(max-width:768px)');
+// Fills the phone layout's scrolling column with every image and video.
+// Only built on phones, so desktop doesn't load the whole gallery at once.
+// Videos don't autoplay here, since several can be on screen together.
+function renderImageStack(){
+  var stack=document.getElementById('popup-image-stack');
+  if(!stack)return;
+  stack.innerHTML=POPUP_STACK_MQ.matches?imageStackHTML(activeProjectImages,'activeProjectImages'):'';
+}
+// HTML for a column of every image/video in a project. imagesExpr is the JS
+// expression the full-screen view pages through (see bmMedia()).
+function imageStackHTML(images,imagesExpr){
+  return images.map(function(url,i){
+    if(isVidUrl(url)){
+      if(url.indexOf('youtube')>-1||url.indexOf('youtu.be')>-1){
+        var eu=url;
+        if(url.indexOf('watch?v=')>-1)eu=url.replace('watch?v=','embed/');
+        if(url.indexOf('youtu.be/')>-1)eu='https://www.youtube.com/embed/'+url.split('youtu.be/')[1];
+        return '<iframe src="'+eu+'" loading="lazy" allowfullscreen></iframe>';
+      }
+      if(url.indexOf('vimeo')>-1){
+        var vimeoId=url.split('vimeo.com/')[1].split('?')[0].split('/')[0];
+        return '<iframe src="https://player.vimeo.com/video/'+vimeoId+'" loading="lazy" allowfullscreen></iframe>';
+      }
+      return '<video src="'+url+'" controls muted playsinline preload="metadata"></video>';
+    }
+    return '<img src="'+url+'" alt="Project image '+(i+1)+'" loading="lazy" onclick="openLB('+imagesExpr+','+i+')">';
+  }).join('');
+}
+POPUP_STACK_MQ.addEventListener('change',function(){if(document.getElementById('project-popup').classList.contains('expanded'))renderImageStack()});
+// Static version: same idea, at its own phone breakpoint (matches the
+// @media(max-width:820px) bottom-sheet layout).
+var BM_STACK_MQ=window.matchMedia('(max-width:820px)');
+function renderBMStack(){
+  var stack=document.getElementById('bm-image-stack');
+  stack.innerHTML=(BM_STACK_MQ.matches&&bmZone)?imageStackHTML(bmZone.images||[],'bmZone.images'):'';
+}
+BM_STACK_MQ.addEventListener('change',function(){if(document.getElementById('browse-modal-backdrop').classList.contains('visible')){renderBMStack();updBM()}});
 
 function expandModal(){
   const p=document.getElementById('project-popup');
@@ -1436,10 +1503,13 @@ function expandModal(){
   // Reset image gallery
   currentImageIdx=0;
   updateImageDisplay();
+  renderImageStack();
+  p.scrollTop=0;
 }
 
 function collapseModal(){
   const p=document.getElementById('project-popup');
+  document.getElementById('popup-image-stack').innerHTML='';
   p.querySelector('#popup-collapsed').style.display='';
   p.querySelector('#popup-expanded').style.display='none';
   p.classList.remove('expanded');
@@ -1447,7 +1517,7 @@ function collapseModal(){
   if(activeModalZone)positionModal(p,activeModalZone);
 }
 
-function closePopup(){const p=document.getElementById('project-popup');p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking()}
+function closePopup(){const p=document.getElementById('project-popup');document.getElementById('popup-image-stack').innerHTML='';p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking()}
 
 function updateTabs(zone){
   document.querySelectorAll('.pip-tab').forEach(t=>t.classList.toggle('active',zone&&t.dataset.zone===zone.tab));
@@ -1850,7 +1920,7 @@ function render(){
 function drawSign(zone,gY){
   const x=zone.x-cameraX,W=canvas.width;
   if(x<-200||x>W+200)return;
-  const isNear=Math.abs(player.x-zone.x)<110;
+  const isNear=Math.abs(player.x-zone.x)<SIGN_REACH;
   const visited=visitedZones.has(zone.label);
 
   // Choose sign image based on state

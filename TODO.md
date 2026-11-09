@@ -2,8 +2,7 @@
 
 ## Mobile fixes
 
-1. **Rethink how projects open on mobile.** Try scrolling through the project instead of using the arrows. (Design first, e.g. in Claude Design.)
-2. **Show players how to move.** They need to know to press the left and right sides of the screen. (Design the hint, then Claude Code decides when it shows.)
+1. **Show players how to move.** They need to know to press the left and right sides of the screen. (Design the hint, then Claude Code decides when it shows.)
 
 ## Static version: design notes
 
@@ -39,3 +38,7 @@
 - Mobile: no more jumping on tap; each half of the screen walks that way (Nov 6).
 - Fixed the full-screen image view freezing the portfolio in game mode on touch screens (Nov 6).
 - Full-screen view on mobile: image fills the width, arrows moved next to the counter, swipe between images, pinch and double-tap to zoom (Nov 6).
+- Mobile: the eye-strain hint's "Got it" button and the About/Work/Contact tabs can be tapped again (Nov 6).
+- Mobile: project popups in game mode show all images in a column you scroll through, instead of one image with arrows (Nov 6).
+- Static version on phones: project text first, then every image in a column you scroll through (Nov 9).
+- Clicking or tapping a sign you're already standing by opens it without teleporting (Nov 9).
