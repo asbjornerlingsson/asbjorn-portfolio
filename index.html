@@ -213,49 +213,73 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #browse-mode a{color:inherit}
 #browse-mode :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 #browse-modal:focus{outline:none}
+#mode-switch{transition:top .25s ease}
 
-.bw{max-width:1160px;margin:0 auto;padding:120px 40px 56px}
-.bw-name{font-size:clamp(44px,7.5vw,88px);font-weight:800;letter-spacing:-0.035em;line-height:0.98;margin:18px 0 22px}
-.bw-roles{font-size:clamp(20px,2.6vw,28px);font-weight:500;line-height:1.35;letter-spacing:-0.01em}
-.bw-roles span{color:var(--accent);padding:0 4px}
-.bw-lede{font-size:18px;line-height:1.65;color:var(--muted);max-width:620px;margin-top:20px}
-.bw-nav{display:flex;flex-wrap:wrap;gap:10px;margin-top:36px}
-.bw-nav a{font-size:15px;font-weight:600;text-decoration:none;padding:10px 20px;border:1.5px solid var(--ink);border-radius:999px;transition:background .15s,color .15s}
-.bw-nav a:hover{background:var(--ink);color:#fff}
+.bw-hero{max-width:1160px;margin:0 auto;padding:80px 40px 40px}
+.bw-hi{font-size:clamp(44px,7.5vw,72px);font-weight:800;letter-spacing:-0.035em;line-height:1.25;margin:24px 0 8px;width:419px;max-width:100%}
+.bw-lede{font-size:24px;line-height:1.65;max-width:620px;margin-top:8px}
 
-.bw-section{padding-top:104px;scroll-margin-top:16px}
+/* Sticky section menu. The item for the section you're in is selected
+   (scroll-spy in updateBrowseMenu()). On phones, once it's stuck at the
+   top, the labels fold away into icons. */
+.bw-menu{position:sticky;top:0;z-index:5;background:rgba(255,255,255,0.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:8px}
+.bw-menu-inner{max-width:1160px;margin:0 auto;padding:12px 40px;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:10px;transition:padding-right .3s}
+/* When stuck, keep the tabs clear of the mode switch, which sits in the
+   bar's top-right corner (see placeModeSwitch()). */
+.bw-menu.is-stuck .bw-menu-inner{padding-right:clamp(40px,calc(152px - (100vw - 1176px) / 2),144px)}
+#browse-mode .bw-tab{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border-radius:999px;font-size:15px;font-weight:600;text-decoration:none;border:1.5px solid var(--ink);box-sizing:border-box;background:transparent;color:var(--ink);padding:0 20px;transition:padding .42s cubic-bezier(.4,0,.2,1),background .15s,color .15s,border-color .15s,transform .15s}
+#browse-mode .bw-tab:hover{background:#ececef;color:var(--ink)}
+#browse-mode .bw-tab[aria-current="true"]{background:var(--ink);color:#fff}
+#browse-mode .bw-tab[aria-current="true"]:hover{background:#34363b;border-color:#34363b;color:#fff}
+.bw-tab:active{transform:scale(.97)}
+.bw-tab-lbl{display:inline-block;max-width:220px;opacity:1;overflow:hidden;white-space:nowrap;transition:max-width .42s cubic-bezier(.4,0,.2,1),opacity .22s ease .16s}
+.bw-tab-ico{display:inline-flex;align-items:center;justify-content:center;width:0;height:22px;opacity:0;transform:scale(.5) rotate(-12deg);overflow:hidden;transition:width .42s cubic-bezier(.4,0,.2,1),opacity .14s ease,transform .3s ease}
+@media(max-width:720px){
+  #browse-mode .bw-menu.is-stuck .bw-tab{padding:0 9.5px}
+  .bw-menu.is-stuck .bw-tab-lbl{max-width:0;opacity:0;transition:max-width .42s cubic-bezier(.4,0,.2,1),opacity .14s ease}
+  .bw-menu.is-stuck .bw-tab-ico{width:22px;opacity:1;transform:scale(1) rotate(0);transition:width .42s cubic-bezier(.4,0,.2,1),opacity .2s ease .42s,transform .32s cubic-bezier(.34,1.4,.64,1) .42s}
+}
+@media(prefers-reduced-motion:reduce){.bw-tab,.bw-tab-lbl,.bw-tab-ico{transition:none!important}}
 
-.bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:56px 32px}
+.bw{max-width:1160px;margin:0 auto;padding:0 40px}
+.bw-section{padding-top:104px;scroll-margin-top:80px}
+.bw-section:first-child{padding-top:64px}
+.bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:64px 40px}
 .bw-card{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:20px;cursor:pointer;min-width:0}
-.bw-card-media{aspect-ratio:4/3;background:var(--surface);border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:28px;transition:box-shadow .2s}
-.bw-card-media img{width:100%;height:100%;object-fit:contain;transition:transform .45s cubic-bezier(.2,.7,.2,1)}
-.bw-card:hover .bw-card-media,.bw-card:focus-visible .bw-card-media{box-shadow:0 0 0 2px var(--accent)}
-.bw-card:hover .bw-card-media img,.bw-card:focus-visible .bw-card-media img{transform:scale(1.045)}
-#browse-mode .bw-card:focus-visible{outline:none}
-.bw-card-title{font-size:21px;font-weight:700;letter-spacing:-0.015em;display:flex;justify-content:space-between;gap:12px}
+.bw-card-media{aspect-ratio:4/3;background:var(--surface);border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:28px;box-sizing:border-box;transition:background-color .35s ease}
+.bw-card-media img{width:100%;height:100%;object-fit:contain;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.bw-card:hover .bw-card-media,.bw-card:focus-visible .bw-card-media{background-color:#f9f9fa}
+.bw-card:hover .bw-card-media img,.bw-card:focus-visible .bw-card-media img{transform:scale(1.08)}
+#browse-mode .bw-card:focus-visible{outline:2px solid var(--accent);outline-offset:6px;border-radius:18px}
+/* Title gets an underline that draws in from the left on hover. */
+.bw-card-title{display:inline;font-size:21px;font-weight:700;letter-spacing:-0.015em;background-image:linear-gradient(var(--ink),var(--ink));background-size:0 2px;background-repeat:no-repeat;background-position:0 100%;padding-bottom:2px;transition:background-size .35s cubic-bezier(.2,.7,.2,1)}
+.bw-card:hover .bw-card-title,.bw-card:focus-visible .bw-card-title{background-size:100% 2px}
+@media(prefers-reduced-motion:reduce){.bw-card-media img,.bw-card-title{transition:none}}
 .bw-card-what{font-size:15px;line-height:1.55;color:var(--muted);margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .bw-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .bw-tag{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.5px;padding:4px 10px;border-radius:999px;background:var(--surface);color:var(--ink)}
 
-.bw-about{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:72px;align-items:start}
+.bw-about{max-width:720px}
 .bw-about-title{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-0.02em;margin-bottom:18px}
 .bw-about p{font-size:19px;line-height:1.7}
 .bw-about p+p{margin-top:16px}
-.bw-contact{list-style:none}
-.bw-contact li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:18px 0;font-size:17px}
+.bw-contact{list-style:none;max-width:720px}
+.bw-contact li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:18px 0;border-top:1px solid var(--line);font-size:17px}
+.bw-contact li:last-child{border-bottom:1px solid var(--line)}
 .bw-contact-k{font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 .bw-contact a{text-decoration:none;font-weight:600;overflow-wrap:anywhere;text-align:right}
 .bw-contact a:hover{color:var(--accent-ink)}
 
-.bw-footer{margin-top:104px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
-.bw-play{all:unset;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--accent-ink)}
-.bw-play:hover{text-decoration:underline}
+.bw-footer{margin-top:104px;padding:24px 0 56px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
 
 @media(max-width:720px){
-  .bw{padding:112px 20px 40px}
-  .bw-lede{font-size:16px}
+  .bw-hero{padding:80px 20px 32px}
+  .bw-lede{font-size:20px}
+  .bw-menu-inner{padding:12px 20px}
+  .bw{padding:0 20px}
   .bw-section{padding-top:72px}
-  .bw-about{grid-template-columns:1fr;gap:36px}
+  .bw-section:first-child{padding-top:48px}
+  .bw-grid{gap:48px 32px}
   .bw-about p{font-size:17px}
   .bw-footer{margin-top:72px}
 }
@@ -547,49 +571,54 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
           <div class="bw-tags bm-tags" id="bm-tags"></div>
           <div class="bm-label">What</div>
           <p class="bm-desc" id="bm-what"></p>
-          <div class="bm-label">How</div>
+          <div class="bm-label" id="bm-how-label">How</div>
           <p class="bm-desc" id="bm-how"></p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="bw">
-    <header class="bw-hero">
-      <h1 class="bw-name">Ásbjörn Erlingsson</h1>
-      <p class="bw-roles">UI &amp; product designer<span>/</span>illustrator<span>/</span>game maker</p>
-      <p class="bw-lede">I make interfaces, illustrations and games.</p>
-      <nav class="bw-nav" aria-label="Sections">
-        <a href="#bw-work">Work</a>
-        <a href="#bw-about">About</a>
-        <a href="#bw-about">Contact</a>
-      </nav>
-    </header>
+  <header class="bw-hero" id="bw-hero">
+    <h1 class="bw-hi">Hi, my name is Ásbjörn!</h1>
+    <p class="bw-lede">I make interfaces, illustrations and games.</p>
+  </header>
 
-    <section class="bw-section" id="bw-work" aria-label="Work">
-      <div class="bw-grid" id="browse-project-grid"></div>
+  <nav class="bw-menu" id="bw-menu" aria-label="Sections">
+    <div class="bw-menu-inner">
+        <a class="bw-tab" href="#bw-design" data-section="bw-design" aria-current="true" title="Interfaces &amp; games"><span class="bw-tab-lbl">Interfaces &amp; games</span><span class="bw-tab-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="6"></rect><path d="M6 12h4M8 10v4"></path><circle cx="15.5" cy="11" r="0.8"></circle><circle cx="17.5" cy="13.5" r="0.8"></circle></svg></span></a>
+        <a class="bw-tab" href="#bw-illustration" data-section="bw-illustration" aria-current="false" title="Illustration &amp; designs"><span class="bw-tab-lbl">Illustration &amp; designs</span><span class="bw-tab-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg></span></a>
+        <a class="bw-tab" href="#bw-about" data-section="bw-about" aria-current="false" title="About"><span class="bw-tab-lbl">About</span><span class="bw-tab-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg></span></a>
+        <a class="bw-tab" href="#bw-contact" data-section="bw-contact" aria-current="false" title="Contact"><span class="bw-tab-lbl">Contact</span><span class="bw-tab-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg></span></a>
+    </div>
+  </nav>
+
+  <main class="bw">
+    <section class="bw-section" id="bw-design" aria-label="Interfaces &amp; games">
+      <div class="bw-grid" id="bw-grid-design"></div>
+    </section>
+
+    <section class="bw-section" id="bw-illustration" aria-label="Illustration &amp; designs">
+      <div class="bw-grid" id="bw-grid-illustration"></div>
     </section>
 
     <section class="bw-section" id="bw-about" aria-label="About">
       <div class="bw-about">
-        <div>
-          <h3 class="bw-about-title">Hi, my name is Ásbjörn!</h3>
-          <p>I'm a digital product designer, illustrator, animator and a dabbler in all things digital.</p>
-          <p>I love a challenge; get me a cup of coffee, some new software, and I'll deliver!</p>
-        </div>
-        <ul class="bw-contact">
-          <li><span class="bw-contact-k">Email</span><a href="mailto:asbjornerlingsson@gmail.com">asbjornerlingsson@gmail.com</a></li>
-          <li><span class="bw-contact-k">Phone</span><a href="tel:+3546616443">661 6443</a></li>
-          <li><span class="bw-contact-k">Based in</span><span>Reykjavík, Iceland</span></li>
-        </ul>
+        <h3 class="bw-about-title">Hi, my name is Ásbjörn!</h3>
+        <p>I'm a digital product designer, illustrator, animator and a dabbler in all things digital.</p>
+        <p>I love a challenge; get me a cup of coffee, some new software, and I'll deliver!</p>
       </div>
     </section>
 
-    <footer class="bw-footer">
-      <span>&copy; <span id="bw-year"></span> Ásbjörn Erlingsson</span>
-      <button class="bw-play" onclick="toggleMode()">&#9654; Rather play? Turn game mode on</button>
-    </footer>
-  </div>
+    <section class="bw-section" id="bw-contact" aria-label="Contact">
+      <ul class="bw-contact">
+        <li><span class="bw-contact-k">Email</span><a href="mailto:asbjornerlingsson@gmail.com">asbjornerlingsson@gmail.com</a></li>
+        <li><span class="bw-contact-k">Phone</span><a href="tel:+3546616443">661 6443</a></li>
+        <li><span class="bw-contact-k">Based in</span><span>Reykjavík, Iceland</span></li>
+      </ul>
+    </section>
+
+    <footer class="bw-footer">&copy; Ásbjörn Erlingsson</footer>
+  </main>
 </div>
 
 <div id="lightbox" onclick="closeLB(event)">
@@ -658,49 +687,49 @@ const ZONES=[
     header:'ABOUT — Ásbjörn Erlingsson',
     content:`I'm a digital product designer, illustrator, animator and a dabbler in all things digital.<br><br>I love a challenge; get me a cup of coffee, some new software, and I'll deliver!<br><br><span>✉ <a href="mailto:asbjornerlingsson@gmail.com" style="color:inherit">asbjornerlingsson@gmail.com</a></span><br><span>☎ 6616443</span>`,
     xp:50},
-  {x:1550,label:'VEITA',type:'project',tab:'work',
+  {x:1550,label:'VEITA',type:'project',tab:'work',cat:'design',
     title:'Veita',
     what:'Merging the financial aid application systems used by Reykjavík and SÍS (the Icelandic Association of Local Authorities) into one product.',
     how:'User research mapped both existing workflows. I simplified a very complex one and merged it with a simpler one whose main problem was its interface.',
     tags:['UX Research','UI Design','Figma','Workflows'],
     images:['img/veita1.webp','img/veita2.webp','img/veita3.webp','img/veita4.webp'],
     xp:100},
-  {x:2100,label:'MENIGA',type:'project',tab:'work',
+  {x:2100,label:'MENIGA',type:'project',tab:'work',cat:'illustration',
     title:'Meniga Brand Revamp',
     what:'A new illustration library for Icelandic fintech company Meniga after their rebrand.',
     how:'The first illustrations made for their new design system, in a visual style I developed to match its language.',
     tags:['Illustration','Branding','Figma','Design System'],
     images:['img/meniga8.webp','img/meniga9.webp','img/meniga10.webp','img/meniga11.webp','img/meniga12.webp','img/meniga13.webp','img/meniga14.webp','img/meniga15.webp'],
     xp:100},
-  {x:2650,label:'DIGITAL PRODUCTS',type:'project',tab:'work',
+  {x:2650,label:'DIGITAL PRODUCTS',type:'project',tab:'work',cat:'design',
     title:'Digital Products',
     what:"Building permit tools, in-house asset management and much more for the City of Reykjavík.",
     how:'Proof-of-concept prototypes, cross-disciplinary teams, endless back-and-forth with stakeholders and an obscene amount of coffee, all held together by a design system that grows with the products.',
     tags:['Product Design','Design Systems','Prototyping','Figma'],
     images:['img/prod1.webp','img/prod2.webp','img/prod3.webp','img/prod4.webp','vid/prod5.mp4'],
     xp:100},
-  {x:3200,label:'ILLUSTRATIONS',type:'project',tab:'work',
+  {x:3200,label:'ILLUSTRATIONS',type:'project',tab:'work',cat:'illustration',
     title:'Illustrations',
     what:"Children's books, youth drug prevention campaigns, commissions and personal work.",
     how:'Adobe Photoshop, Adobe Illustrator, Procreate.',
     tags:['Photoshop','Illustrator','Procreate','Illustration'],
     images:['img/illustrations1.webp','img/illustrations2.webp','img/illustrations4.webp','img/illustrations5.webp','img/illustrations6.webp','img/illustrations7.webp','img/illustrations9.webp','img/illustrations11.webp'],
     xp:100},
-  {x:3750,label:'GAMES',type:'project',tab:'work',
+  {x:3750,label:'GAMES',type:'project',tab:'work',cat:'design',
     title:'Games & Experiments',
     what:"A 2D platformer where you stomp on sexists instead of Goombas. A phone app that keeps your phone restless and miserable in every position. A first-person game you play as either an arthritic old person or a fit young one.",
     how:'Unity, Pure Data, Blender, Photoshop and pure stubbornness.',
     tags:['Unity','Game Design','Blender','Pure Data'],
     images:['img/other3.webp','https://vimeo.com/330799951?share=copy&fl=sv&fe=ci','https://vimeo.com/1174009421?share=copy&fl=sv&fe=ci','https://vimeo.com/502108393?share=copy&fl=sv&fe=ci','https://www.youtube.com/watch?v=pbdCRVmz6Z4'],
     xp:100},
-  {x:4300,label:'ODD JOBS',type:'project',tab:'work',
+  {x:4300,label:'ODD JOBS',type:'project',tab:'work',cat:'illustration',
     title:'Odd Jobs',
     what:'Smaller projects that break up the workday.',
     how:'Photoshop, Illustrator, Procreate and Figma, with After Effects for the bigger ones. Luckily, hardly any PowerPoint.',
     tags:['Photoshop','Illustrator','After Effects','Figma'],
     images:['img/oddjobs3.webp','https://vimeo.com/1174011231?share=copy&fl=sv&fe=ci','img/oddjobs5.webp','img/oddjobs7.webp','img/oddjobs8.webp','img/oddjobs9.webp','img/oddjobs10.webp'],
     xp:100},
-  {x:4850,label:'THE HAPPIEST DAY OF MY LIFE',type:'project',tab:'work',
+  {x:4850,label:'THE HAPPIEST DAY OF MY LIFE',type:'project',tab:'work',cat:'illustration',
     title:'The Happiest Day of My Life',
     what:'My wedding! Print design that added a touch of colour to an already perfect day.',
     how:'Procreate, InDesign, Illustrator.',
@@ -716,32 +745,93 @@ const ZONES=[
 // Populate browse mode projects. Reads each zone's images[] array — the
 // same one the game-mode gallery uses — so both modes stay in sync. A zone
 // can set `cover` to pick its card image; otherwise the first still is used.
+// Projects that only appear in the static version (no sign in the game).
+const BROWSE_ONLY_PROJECTS=[
+  {type:'project',cat:'design',
+   title:'This Portfolio',
+   what:'The game you might have just played: a side-scrolling platformer built in a single HTML file with Canvas and vanilla JavaScript.',
+   how:'',
+   tags:['Game Design','UI Design','JavaScript','Figma'],
+   images:['img/portfolio1.webp']}
+];
+// Static version: fills the "Interfaces & games" and "Illustration &
+// designs" grids, in ZONES order, with the static-only projects last.
 function populateBrowse(){
-  var grid=document.getElementById('browse-project-grid');
-  if(!grid)return;
-  grid.innerHTML='';
-  var projects=ZONES.filter(function(z){return z.type==='project'});
-  var yearEl=document.getElementById('bw-year');
-  if(yearEl)yearEl.textContent=new Date().getFullYear();
-  projects.forEach(function(z){
-    var card=document.createElement('button');
-    card.type='button';card.className='bw-card';
-    var media=document.createElement('div');media.className='bw-card-media';
-    var cover=z.cover||(z.images||[]).filter(function(u){return !isVidUrl(u)})[0];
-    if(cover){
-      var img=document.createElement('img');
-      img.src=cover;img.alt='';img.loading='lazy';img.decoding='async';
-      media.appendChild(img);
-    }
-    var body=document.createElement('div');
-    var h=document.createElement('h3');h.className='bw-card-title';h.textContent=z.title;
-    var p=document.createElement('p');p.className='bw-card-what';p.textContent=z.what;
-    body.appendChild(h);body.appendChild(p);body.appendChild(renderTags(z.tags));
-    card.appendChild(media);card.appendChild(body);
-    card.onclick=function(){openBM(z)};
-    grid.appendChild(card);
+  var projects=ZONES.filter(function(z){return z.type==='project'}).concat(BROWSE_ONLY_PROJECTS);
+  ['design','illustration'].forEach(function(cat){
+    var grid=document.getElementById('bw-grid-'+cat);
+    if(!grid)return;
+    grid.innerHTML='';
+    projects.filter(function(z){return z.cat===cat}).forEach(function(z){grid.appendChild(browseCard(z))});
   });
+  updateBrowseMenu();
 }
+function browseCard(z){
+  var card=document.createElement('button');
+  card.type='button';card.className='bw-card';
+  var media=document.createElement('div');media.className='bw-card-media';
+  var cover=z.cover||(z.images||[]).filter(function(u){return !isVidUrl(u)})[0];
+  if(cover){
+    var img=document.createElement('img');
+    img.src=cover;img.alt='';img.loading='lazy';img.decoding='async';
+    media.appendChild(img);
+  }
+  var body=document.createElement('div');
+  var h=document.createElement('h3');
+  var t=document.createElement('span');t.className='bw-card-title';t.textContent=z.title;h.appendChild(t);
+  var p=document.createElement('p');p.className='bw-card-what';p.textContent=z.what;
+  body.appendChild(h);body.appendChild(p);body.appendChild(renderTags(z.tags));
+  card.appendChild(media);card.appendChild(body);
+  card.onclick=function(){openBM(z)};
+  return card;
+}
+
+// Sticky menu: selects the item for the section you're scrolled into, and
+// marks the menu as stuck once the hero has scrolled away.
+var BW_SECTIONS=['bw-design','bw-illustration','bw-about','bw-contact'];
+// A tapped menu item stays selected until the visitor scrolls by hand:
+// About and Contact are short, so scrolling to About also reaches the
+// bottom of the page, which would otherwise select Contact.
+var bwPickedSection=null;
+function updateBrowseMenu(){
+  var bm=document.getElementById('browse-mode'),menu=document.getElementById('bw-menu');
+  if(!bm||!menu)return;
+  // Measuring only works while the static version is on screen.
+  if(currentMode!=='browse'){placeModeSwitch();return}
+  var active=BW_SECTIONS[0];
+  BW_SECTIONS.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<=120)active=id;
+  });
+  // Contact is short and may never reach the menu; select it at the bottom.
+  if(bm.scrollTop>0&&bm.scrollTop+bm.clientHeight>=bm.scrollHeight-4)active='bw-contact';
+  if(bwPickedSection)active=bwPickedSection;
+  menu.querySelectorAll('.bw-tab').forEach(function(a){a.setAttribute('aria-current',a.dataset.section===active?'true':'false')});
+  var hero=document.getElementById('bw-hero');
+  menu.classList.toggle('is-stuck',!!(hero&&hero.getBoundingClientRect().bottom<=0));
+  placeModeSwitch();
+}
+// The mode switch keeps its usual spot (40px from the top right) and, once
+// the menu sticks, slides up to sit centred in the sticky bar.
+function placeModeSwitch(){
+  var sw=document.getElementById('mode-switch'),menu=document.getElementById('bw-menu');
+  if(!sw)return;
+  if(currentMode==='browse'&&menu&&menu.offsetHeight&&menu.classList.contains('is-stuck')){
+    sw.style.top=Math.round((menu.offsetHeight-sw.offsetHeight)/2)+'px';
+  }else sw.style.top='40px';
+}
+(function(){
+  var bm=document.getElementById('browse-mode');
+  bm.addEventListener('scroll',updateBrowseMenu,{passive:true});
+  window.addEventListener('resize',updateBrowseMenu);
+  document.querySelectorAll('#bw-menu .bw-tab').forEach(function(a){
+    a.addEventListener('click',function(){bwPickedSection=a.dataset.section;updateBrowseMenu()});
+  });
+  // Scrolling by hand hands selection back to the scroll position.
+  ['wheel','touchstart','keydown'].forEach(function(ev){
+    bm.addEventListener(ev,function(e){if(ev==='keydown'&&e.key==='Enter')return;bwPickedSection=null},{passive:true});
+  });
+})();
 function renderTags(tags,el){
   el=el||document.createElement('div');
   el.classList.add('bw-tags');el.innerHTML='';
@@ -764,6 +854,7 @@ function toggleMode(){
     populateBrowse(); // refresh browse mode cards
     closeModeHint();
     document.getElementById('browse-mode').classList.add('active');
+    updateBrowseMenu();
     document.getElementById('game-mode').classList.add('hidden');
     document.getElementById('intro-overlay').classList.add('hidden');
     gameStarted=true;
@@ -781,6 +872,7 @@ function toggleMode(){
     currentMode='game';
     document.getElementById('browse-mode').classList.remove('active');
     document.getElementById('browse-mode').scrollTop=0;
+    placeModeSwitch();
     document.getElementById('game-mode').classList.remove('hidden');
     document.body.style.overflow='hidden';
     // Switch to on state
@@ -1393,7 +1485,9 @@ function openBM(z){
   bmZone=z;bmIdx=0;
   document.getElementById('bm-title').textContent=z.title;
   document.getElementById('bm-what').textContent=z.what;
-  document.getElementById('bm-how').textContent=z.how;
+  document.getElementById('bm-how').textContent=z.how||'';
+  document.getElementById('bm-how-label').style.display=z.how?'':'none';
+  document.getElementById('bm-how').style.display=z.how?'':'none';
   renderTags(z.tags,document.getElementById('bm-tags'));
   updBM();
   renderBMStack();

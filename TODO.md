@@ -8,20 +8,13 @@
 
 "Static version" = the non-game version of the site (in the code it's called browse mode).
 
-1. **Header design:** revisit the font sizes and the pink slashes in "UI & product designer / illustrator / game maker".
-2. **Category buttons' hover state:** the text becomes unreadable on hover. Fix it.
-3. **Merge the category buttons and the section headers.**
-   - The buttons (Work / About / Contact) act as the section headers.
-   - They stick to the top of the screen while scrolling.
-   - The button for the section you're in switches to a selected state.
-   - This needs detailed design work first.
-4. **Tag pills on project cards:** decide whether to keep them.
-5. **About me and contact section:** look at other portfolios for good ways to design it.
+1. **Phones, top of the page:** before the menu sticks, the four menu buttons wrap onto three rows. The Claude Design file only covers desktop, so this may need a phone design.
+2. **"This Portfolio" project:** has one game screenshot and no "How" text yet. Add your own images and text.
 
 ## 1939 Games application (still open)
 
 - New case study: a mobile game UI concept (design work, Ásbjörn). Claude can draft the brief: screen list, flow and test plan.
-- New case study: "This portfolio is a game", with placeholder images to start.
+- Flesh out the "This Portfolio" case study (it exists in the static version now, with one screenshot): sprite sheets, Figma frames, mobile controls.
 - Reorder the projects: game UI concept, portfolio-as-game, Games & Experiments, Illustrations, Digital Products, Veita.
 - Copy: change the hero line to "Game & product UI designer / illustrator" and mention Reykjavík in About.
 - Still to decide:
@@ -42,3 +35,4 @@
 - Mobile: project popups in game mode show all images in a column you scroll through, instead of one image with arrows (Nov 6).
 - Static version on phones: project text first, then every image in a column you scroll through (Nov 9).
 - Clicking or tapping a sign you're already standing by opens it without teleporting (Nov 9).
+- Static version rebuilt from the Claude Design file: new hero, sticky Interfaces & games / Illustration & designs / About / Contact menu with selected state (icons on phones), work split into two sections, new card hover, separate About and Contact, "This Portfolio" card. The game/static switch stays top right and lines up with the sticky menu (Nov 9).
