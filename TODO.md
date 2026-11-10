@@ -11,7 +11,7 @@
 "Static version" = the non-game version of the site (in the code it's called browse mode).
 
 1. **Phones, top of the page:** before the menu sticks, the four menu buttons wrap onto three rows. The Claude Design file only covers desktop, so this may need a phone design.
-2. **"This Portfolio" project:** has one game screenshot and no "How" text yet. Content in progress, first draft:
+2. **"This Portfolio" project:** first-draft copy is on the site (title "My portfolio"); it has one game screenshot. Draft:
    - **Title:** My portfolio
    - **What:** A retro-style 2D side scroller displaying my work and information.
    - **How:** As much as simplifying complicated processes and interfaces is vital to my work, I also love over-complicating things if they make them more fun/interesting. So why not make my portfolio a video game? Tools: Figma, Illustrator, Claude.
@@ -49,3 +49,4 @@
 - Static About/Contact rebuilt from the Claude Design file: portrait + "I'm Ásbjörn" text, centred "Get in touch" with email and phone icon buttons; game About dialog uses the same text (Nov 10).
 - Game: touch-to-move hint (edge pulse + tapping pixel hand) on touch screens until the first tap; bottom menu in the Arcade select style with the static menu's four sections (icons on phones); intro lines 1–2 before ABOUT with a pause between, line 3 between ABOUT and VEITA (Nov 10).
 - Game: more space between bottom-menu buttons; "+XP" shows on the XP bar itself; "LVL 1" under the avatar; reading every sign shows LEVEL UP and goes to LVL 2 (Nov 10).
+- Game: the +XP number appears as soon as a sign is opened and rides along with the filling bar; LEVEL UP still waits for the popup to close; LVL label moved down a little (Nov 10).

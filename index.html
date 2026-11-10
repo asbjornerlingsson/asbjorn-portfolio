@@ -55,10 +55,12 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 /* "+100XP" sits on the XP bar itself, just past the end of the pink fill;
    when there's no room left it moves inside the fill, in black. */
 #xp-track{position:relative}
-#xp-total-label{position:absolute;top:50%;transform:translateY(-50%);font-size:13px;line-height:1;white-space:nowrap;opacity:0;transition:opacity 0.3s,left 0.3s;pointer-events:none}
+#xp-total-label{position:absolute;top:50%;transform:translateY(-50%);font-size:13px;line-height:1;white-space:nowrap;opacity:0;transition:opacity 0.3s,left 0.6s cubic-bezier(.25,.8,.3,1);pointer-events:none}
+/* Placing it at the old end of the fill, before it rides along. */
+#xp-total-label.no-move{transition:opacity 0.3s}
 #xp-total-label.show{opacity:1}
 #xp-total-label.inside{color:#050E08;text-shadow:none}
-.hud-avatar-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+.hud-avatar-col{display:flex;flex-direction:column;align-items:center;gap:11px;flex-shrink:0}
 #hud-level{font-size:calc(12px + 4px * var(--rs))}
 #hud-level.bump{animation:lvl-bump .9s steps(2,end) 3}
 @keyframes lvl-bump{0%{opacity:1}50%{opacity:.2}}
@@ -505,7 +507,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span class="hud-stat" style="width:32px">XP</span>
-        <div class="hud-bar-track" id="xp-track" style="height:16px;background:rgba(255,40,137,0.15);border-radius:0;overflow:hidden"><div id="xp-fill" style="width:0%;height:100%;background:#FF2889;border-radius:0;transition:width 0.3s"></div><span class="hud-stat" id="xp-total-label"></span></div>
+        <div class="hud-bar-track" id="xp-track" style="height:16px;background:rgba(255,40,137,0.15);border-radius:0;overflow:hidden"><div id="xp-fill" style="width:0%;height:100%;background:#FF2889;border-radius:0;transition:width 0.6s cubic-bezier(.25,.8,.3,1)"></div><span class="hud-stat" id="xp-total-label"></span></div>
       </div>
     </div>
   </div>
@@ -804,9 +806,9 @@ const ZONES=[
 // Projects that only appear in the static version (no sign in the game).
 const BROWSE_ONLY_PROJECTS=[
   {type:'project',cat:'design',
-   title:'This Portfolio',
-   what:'The game you might have just played: a side-scrolling platformer built in a single HTML file with Canvas and vanilla JavaScript.',
-   how:'',
+   title:'My portfolio',
+   what:'A retro-style 2D side scroller displaying my work and information.',
+   how:'As much as simplifying complicated processes and interfaces is vital to my work, I also love over-complicating things if they make them more fun/interesting. So why not make my portfolio a video game? Tools: Figma, Illustrator, Claude.',
    tags:['Game Design','UI Design','JavaScript','Figma'],
    images:['img/portfolio1.webp']}
 ];
@@ -1410,24 +1412,27 @@ function spawnXPPopup(worldX,y,amount){
 
 // Reading every sign fills the XP bar: LEVEL UP flashes across the screen
 // and the player goes to level 2.
-let playerLevel=1,pendingXPLabel=0,pendingLevelUp=false;
-// Shows the "+100XP" label on the bar and, if the bar just filled, the
-// level-up, as soon as no dialog or project popup is covering the screen.
+let playerLevel=1,pendingLevelUp=false;
+// Shows the level-up once no dialog or project popup covers the screen.
 function flushXPFeedback(){
   if(dialogOpen||popupOpen)return;
-  if(pendingXPLabel){showXPLabel(pendingXPLabel);pendingXPLabel=0}
   if(pendingLevelUp){pendingLevelUp=false;setTimeout(levelUp,500)}
 }
-// A brief label on the bar (not a persistent total): just right of the
-// pink fill, or inside it in black when there's no room left.
-function showXPLabel(amount){
+// A brief label on the bar (not a persistent total) that travels with the
+// end of the pink fill from `from` to `to` (fractions of the bar): just
+// right of it, or inside it in black when there's no room left.
+function showXPLabel(amount,from,to){
   const totalLabel=document.getElementById('xp-total-label');
   totalLabel.textContent='+'+amount+'XP';
-  const frac=Math.min(1,totalXP/MAX_XP);
-  const trackW=document.getElementById('xp-track').clientWidth,labelW=totalLabel.offsetWidth,fillW=trackW*frac,pad=4;
-  const inside=fillW+pad+labelW>trackW;
+  const trackW=document.getElementById('xp-track').clientWidth,labelW=totalLabel.offsetWidth,pad=4;
+  const inside=trackW*to+pad+labelW>trackW;
+  const at=f=>Math.max(pad,inside?trackW*f-pad-labelW:trackW*f+pad)+'px';
   totalLabel.classList.toggle('inside',inside);
-  totalLabel.style.left=Math.max(pad,inside?fillW-pad-labelW:fillW+pad)+'px';
+  totalLabel.classList.add('no-move');
+  totalLabel.style.left=at(from);
+  void totalLabel.offsetWidth;
+  totalLabel.classList.remove('no-move');
+  totalLabel.style.left=at(to);
   totalLabel.classList.add('show');
   clearTimeout(totalLabel._hideTimeout);
   totalLabel._hideTimeout=setTimeout(function(){totalLabel.classList.remove('show')},2000);
@@ -1447,12 +1452,13 @@ function grantZoneXP(z){
   if(visitedZones.has(z.label))return;
   visitedZones.add(z.label);
   totalXP+=z.xp;
-  const frac=Math.min(1,totalXP/MAX_XP);
+  const before=Math.min(1,(totalXP-z.xp)/MAX_XP),frac=Math.min(1,totalXP/MAX_XP);
   document.getElementById('xp-fill').style.width=(frac*100)+'%';
-  pendingXPLabel=z.xp;
+  // The "+XP" number rides along with the fill as it grows.
+  showXPLabel(z.xp,before,frac);
+  // The level-up waits until the sign's dialog/popup is closed, since it
+  // can cover the screen (on phones it always does).
   if(totalXP>=MAX_XP&&playerLevel===1)pendingLevelUp=true;
-  // The sign's dialog/popup can cover the HUD (on phones it always does),
-  // so the label and any level-up wait until it's closed.
   setTimeout(flushXPFeedback,0);
   const sb=getSignBounds(z);
   spawnXPPopup(z.x,sb.dy,z.xp);
