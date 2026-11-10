@@ -89,21 +89,21 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .pip-tab-ico{display:none}
 .pip-tab-ico svg{display:block}
 @media(max-width:720px){
-  /* Icons only, except the selected button, which shows its name. The
-     switch is fluid: the old button's name folds away as the new one's
-     opens, and the row slides along with them. */
+  /* Icons only, except the selected button, which shows its name.
+     Selecting: the button first widens (icon still showing), then the
+     icon swaps for the name. Deselecting: the name swaps back to the icon,
+     then the button narrows. Both run on the same clock (the 0.15s swap,
+     then the 0.45s resize), so the row trades width without wrapping.
+     The icon floats in the middle; the name's box (at least the icon's
+     20px) sets the button's width. */
   #pip-tabs{gap:8px;flex-wrap:nowrap}
-  .pip-tab{gap:0;padding:0 10px;font-size:13px;letter-spacing:.5px;transition:background .3s,color .3s,border-color .3s,padding .45s cubic-bezier(.4,0,.2,1)}
-  /* Flex + centred: while it's narrower than the name, the name overflows
-     both sides equally, so it opens (and closes) from the middle. Same for
-     the icon. */
-  .pip-tab-lbl{display:inline-flex;justify-content:center;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .45s cubic-bezier(.4,0,.2,1),opacity .15s ease}
-  .pip-tab-ico{display:inline-flex;justify-content:center;width:20px;opacity:1;overflow:hidden;transition:width .45s cubic-bezier(.4,0,.2,1),opacity .2s ease .25s}
+  .pip-tab{position:relative;gap:0;padding:0 10px;font-size:13px;letter-spacing:.5px;transition:background .3s,color .3s,border-color .3s,padding .45s cubic-bezier(.4,0,.2,1) .15s}
+  .pip-tab-lbl{display:inline-flex;justify-content:center;max-width:20px;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .15s ease}
+  .pip-tab-ico{display:inline-flex;justify-content:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;opacity:1;transition:opacity .15s ease .15s}
   .pip-tab.active{padding:0 12px}
-  /* --w is the name's real width (measureTabLabels), so it opens and
-     closes at the same pace as the button next to it. */
-  .pip-tab.active .pip-tab-lbl{max-width:var(--w,240px);opacity:1;transition:max-width .45s cubic-bezier(.4,0,.2,1),opacity .25s ease .2s}
-  .pip-tab.active .pip-tab-ico{width:0;opacity:0;transition:width .45s cubic-bezier(.4,0,.2,1),opacity .12s ease}
+  /* --w is the name's real width (measureTabLabels). */
+  .pip-tab.active .pip-tab-lbl{max-width:var(--w,240px);opacity:1;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .2s ease .6s}
+  .pip-tab.active .pip-tab-ico{opacity:0;transition:opacity .15s ease .6s}
 }
 /* Very small phones (e.g. 320px wide): tighter so the selected name still
    fits on one row with the three icons. */
@@ -195,16 +195,6 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 @media(max-width:768px){#touch-zone-left,#touch-zone-right{display:block}}
 @media(pointer:coarse){#touch-zone-left,#touch-zone-right{display:block}}
 
-/* Subtle directional arrows that appear on touch */
-.touch-arrow{
-  position:absolute;top:50%;transform:translateY(-50%);
-  font-family:'VT323',monospace;font-size:32px;
-  color:rgba(255,40,137,0);transition:color 0.15s;
-  pointer-events:none;
-}
-#touch-zone-left .touch-arrow{left:16px}
-#touch-zone-right .touch-arrow{right:16px}
-.touch-arrow.visible{color:rgba(255,40,137,0.2)}
 
 /* Touch screens: how-to-move hint ("Edge pulse"). The left and right edges
    flash pink in turn while a pixel hand taps each one. Plays at the start
@@ -586,8 +576,8 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   <div id="xp-popup-layer"></div>
 
   <!-- Invisible touch zones for mobile movement -->
-  <div id="touch-zone-left"><span class="touch-arrow">◄</span></div>
-  <div id="touch-zone-right"><span class="touch-arrow">►</span></div>
+  <div id="touch-zone-left"></div>
+  <div id="touch-zone-right"></div>
   <div id="level-up" role="status" aria-live="polite">LEVEL UP</div>
   <div id="move-hint" aria-hidden="true"><div class="mh-pulse mh-l"></div><div class="mh-pulse mh-r"></div><div class="mh-hand mh-l"></div><div class="mh-hand mh-r"></div></div>
 
@@ -1198,8 +1188,6 @@ function init(){
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;if(playerCanvas){playerCanvas.width=window.innerWidth;playerCanvas.height=window.innerHeight;}player.y=canvas.height*GROUND_Y_RATIO}
 
 function setupTouch(){
-  const arrowL=document.querySelector('#touch-zone-left .touch-arrow');
-  const arrowR=document.querySelector('#touch-zone-right .touch-arrow');
 
   // Track active movement touches by ID
   let moveTouches={};
@@ -1278,12 +1266,12 @@ function setupTouch(){
         // Left side — walk left
         hideMoveHint();
         moveTouches[touch.identifier]='left';
-        touchLeft=true;arrowL.classList.add('visible');
+        touchLeft=true;
       }else{
         // Right side — walk right
         hideMoveHint();
         moveTouches[touch.identifier]='right';
-        touchRight=true;arrowR.classList.add('visible');
+        touchRight=true;
       }
     }
   },{passive:false});
@@ -1292,8 +1280,8 @@ function setupTouch(){
     if(currentMode==='browse')return;
     for(let i=0;i<e.changedTouches.length;i++){
       const id=e.changedTouches[i].identifier;
-      if(moveTouches[id]==='left'){touchLeft=false;arrowL.classList.remove('visible')}
-      if(moveTouches[id]==='right'){touchRight=false;arrowR.classList.remove('visible')}
+      if(moveTouches[id]==='left'){touchLeft=false}
+      if(moveTouches[id]==='right'){touchRight=false}
       delete moveTouches[id];
     }
   },{passive:false});
@@ -1301,8 +1289,8 @@ function setupTouch(){
   document.addEventListener('touchcancel',e=>{
     for(let i=0;i<e.changedTouches.length;i++){
       const id=e.changedTouches[i].identifier;
-      if(moveTouches[id]==='left'){touchLeft=false;arrowL.classList.remove('visible')}
-      if(moveTouches[id]==='right'){touchRight=false;arrowR.classList.remove('visible')}
+      if(moveTouches[id]==='left'){touchLeft=false}
+      if(moveTouches[id]==='right'){touchRight=false}
       delete moveTouches[id];
     }
   },{passive:false});

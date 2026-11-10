@@ -54,3 +54,4 @@
 - Game on phones: eye-strain popup has a solid background (LVL no longer shows through) and fits the screen; speech bubbles sit centred above the player and move with them, narrower with wide side padding; the selected bottom-menu button shows its name instead of its icon (Nov 10).
 - Game on touch screens: the how-to-move hint plays once (left, then right) instead of looping; smaller hands filled with the theme's pink (Nov 10).
 - Game: how-to-move hint plays twice per side; on phones the selected bottom-menu button opens/closes its name fluidly; eye-strain hint after 30s instead of 15s (Nov 10).
+- Game on phones: the selected menu button resizes first, then swaps icon for name (and back); pink ◄ ► movement arrows removed (Nov 10).
