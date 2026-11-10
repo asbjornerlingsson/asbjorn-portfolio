@@ -90,8 +90,8 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .pip-tab-ico svg{display:block}
 @media(max-width:720px){
   /* Icons only, except the selected button, which shows its name.
-     Selecting: the icon fades out while the button widens, then the name
-     fades in. Deselecting: the name fades out, then the icon fades back in
+     Selecting: the icon fades out while the button widens, and the name
+     fades in over the end of the widening. Deselecting: the name fades out, then the icon fades back in
      while the button narrows. Both run on the same clock (the 0.15s swap,
      then the 0.45s resize), so the row trades width without wrapping.
      The icon floats in the middle; the name's box (at least the icon's
@@ -102,7 +102,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   .pip-tab-ico{display:inline-flex;justify-content:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;opacity:1;transition:opacity .45s ease .15s}
   .pip-tab.active{padding:0 12px}
   /* --w is the name's real width (measureTabLabels). */
-  .pip-tab.active .pip-tab-lbl{max-width:var(--w,240px);opacity:1;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .2s ease .6s}
+  .pip-tab.active .pip-tab-lbl{max-width:var(--w,240px);opacity:1;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .25s ease .4s}
   .pip-tab.active .pip-tab-ico{opacity:0;transition:opacity .4s ease .15s}
 }
 /* Very small phones (e.g. 320px wide): tighter so the selected name still
