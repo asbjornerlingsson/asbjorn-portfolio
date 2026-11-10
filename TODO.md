@@ -6,6 +6,8 @@
 
 ## Static version: design notes
 
+0. **Portrait photo for About:** the About section has a "[PORTRAIT PHOTO]" placeholder (4:5). Send a photo and it goes in `img/portrait.webp`.
+
 "Static version" = the non-game version of the site (in the code it's called browse mode).
 
 1. **Phones, top of the page:** before the menu sticks, the four menu buttons wrap onto three rows. The Claude Design file only covers desktop, so this may need a phone design.
@@ -40,3 +42,5 @@
 - Game: player starts near the left edge and says three intro lines on the way to the first sign; the world moved 300px right to make room; long speech bubbles wrap (Nov 10).
 - Static version on phones: the sticky menu folds as one smooth two-step animation (shrink to icons in place, then rise into one row with a stretch and squash), and back (Nov 10).
 - Game: intro lines are tied to where the player is walking, not a timer; on phones the lifted speech bubble's tail points at the player (Nov 10).
+- Static About/Contact rebuilt from the Claude Design file: portrait + "I'm Ásbjörn" text, centred "Get in touch" with email and phone icon buttons; game About dialog uses the same text (Nov 10).
+- Game: touch-to-move hint (edge pulse + tapping pixel hand) on touch screens until the first tap; bottom menu in the Arcade select style with the static menu's four sections (icons on phones); intro lines 1–2 before ABOUT with a pause between, line 3 between ABOUT and VEITA (Nov 10).
