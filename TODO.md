@@ -11,7 +11,11 @@
 "Static version" = the non-game version of the site (in the code it's called browse mode).
 
 1. **Phones, top of the page:** before the menu sticks, the four menu buttons wrap onto three rows. The Claude Design file only covers desktop, so this may need a phone design.
-2. **"This Portfolio" project:** has one game screenshot and no "How" text yet. Add your own images and text.
+2. **"This Portfolio" project:** has one game screenshot and no "How" text yet. Content in progress, first draft:
+   - **Title:** My portfolio
+   - **What:** A retro-style 2D side scroller displaying my work and information.
+   - **How:** As much as simplifying complicated processes and interfaces is vital to my work, I also love over-complicating things if they make them more fun/interesting. So why not make my portfolio a video game? Tools: Figma, Illustrator, Claude.
+   - Still to do: more images.
 
 ## 1939 Games application (still open)
 
