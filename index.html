@@ -90,20 +90,20 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .pip-tab-ico svg{display:block}
 @media(max-width:720px){
   /* Icons only, except the selected button, which shows its name.
-     Selecting: the button first widens (icon still showing), then the
-     icon swaps for the name. Deselecting: the name swaps back to the icon,
-     then the button narrows. Both run on the same clock (the 0.15s swap,
+     Selecting: the icon fades out while the button widens, then the name
+     fades in. Deselecting: the name fades out, then the icon fades back in
+     while the button narrows. Both run on the same clock (the 0.15s swap,
      then the 0.45s resize), so the row trades width without wrapping.
      The icon floats in the middle; the name's box (at least the icon's
      20px) sets the button's width. */
   #pip-tabs{gap:8px;flex-wrap:nowrap}
   .pip-tab{position:relative;gap:0;padding:0 10px;font-size:13px;letter-spacing:.5px;transition:background .3s,color .3s,border-color .3s,padding .45s cubic-bezier(.4,0,.2,1) .15s}
   .pip-tab-lbl{display:inline-flex;justify-content:center;max-width:20px;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .15s ease}
-  .pip-tab-ico{display:inline-flex;justify-content:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;opacity:1;transition:opacity .15s ease .15s}
+  .pip-tab-ico{display:inline-flex;justify-content:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;opacity:1;transition:opacity .45s ease .15s}
   .pip-tab.active{padding:0 12px}
   /* --w is the name's real width (measureTabLabels). */
   .pip-tab.active .pip-tab-lbl{max-width:var(--w,240px);opacity:1;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .2s ease .6s}
-  .pip-tab.active .pip-tab-ico{opacity:0;transition:opacity .15s ease .6s}
+  .pip-tab.active .pip-tab-ico{opacity:0;transition:opacity .4s ease .15s}
 }
 /* Very small phones (e.g. 320px wide): tighter so the selected name still
    fits on one row with the three icons. */
