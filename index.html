@@ -1063,23 +1063,32 @@ function showPlayerLine(text,duration,side){
   playerLineTimer=duration;
   playerLineSide=side||'right';
 }
-// What the player says, one line after another, the first time they start
-// walking. Timed to finish around when they reach the first sign. Each
-// entry is [text, seconds on screen].
+// What the player says on the way to the first sign. Each line belongs to
+// a stretch of ground and shows while the player is on it, so the lines
+// follow where they walk, not a timer. [text, from x, to x]
 const INTRO_LINES=[
-  ["Hi, I'm Ásbjörn",1.5],
-  ["I'm a Digital product designer and illustrator",2.3],
-  ["Let's look at some of my stuff",1.7]
+  ["Hi, I'm Ásbjörn",PLAYER_START_X+20,470],
+  ["I'm a Digital product designer and illustrator",520,870],
+  ["Let's look at some of my stuff",920,1190]
 ];
-let introStep=-1; // -1: not started, INTRO_LINES.length: finished
-function advanceIntro(){
-  if(introStep<0||introStep>=INTRO_LINES.length)return;
-  if(playerLineTimer>0)return;
-  const line=INTRO_LINES[introStep++];
-  showPlayerLine(line[0],line[1],'right');
+let introDone=false,introLine=null;
+// Called every frame. The intro ends for good once the player reaches the
+// first sign (or teleports somewhere).
+function updateIntro(){
+  if(introDone)return;
+  const firstSign=ZONES[0].x;
+  if(player.x>=firstSign-SIGN_REACH){endIntro();return}
+  const line=INTRO_LINES.find(l=>player.x>=l[1]&&player.x<l[2]);
+  if(line){
+    // Keep it up while they're on this stretch; the usual countdown fades
+    // it a moment after they step off.
+    showPlayerLine(line[0],0.15,'right');introLine=line;
+  }
 }
-// Stops the intro early (e.g. the player teleported to a sign).
-function endIntro(){introStep=INTRO_LINES.length}
+function endIntro(){
+  introDone=true;
+  if(introLine&&playerLineText===introLine[0]){playerLineTimer=0;playerLineText=''}
+}
 
 function init(){
   canvas=document.getElementById('game-canvas');
@@ -1866,9 +1875,7 @@ function update(){
 
   player.walking=moving;
   player.x+=player.vx;
-  // The first steps to the right start the intro lines.
-  if(player.vx>0&&introStep<0)introStep=0;
-  advanceIntro();
+  updateIntro();
   // Movement clamp has extra room past the logical edge (WORLD_EDGE_MARGIN)
   // so the player can keep walking and visually clip off the screen instead
   // of just stopping dead at the content boundary.
@@ -1972,8 +1979,8 @@ function drawSpeechBubble(bctx,text,anchorX,anchorY,side){
   const lean=side==='right'?'left':'right';
   // tailAttachX: where the tail meets the main body's bottom edge.
   // stepDx: which way its steps run from there (mirrors the Figma asset).
-  const tailAttachX=lean==='left'?27:bw-27;
-  const stepDx=lean==='left'?-6:6;
+  let tailAttachX=lean==='left'?27:bw-27;
+  let stepDx=lean==='left'?-6:6;
   let originX=side==='right'?anchorX+gap:anchorX-gap-bw;
   const wantX=originX;
   originX=Math.max(edgeMargin,Math.min(bctx.canvas.width-edgeMargin-bw,originX));
@@ -1981,6 +1988,15 @@ function drawSpeechBubble(bctx,text,anchorX,anchorY,side){
   // lift it above the "PRESS E" / "PLAYER 1" labels instead of covering them.
   const lift=originX!==wantX&&originX<anchorX+gap&&originX+bw>anchorX-gap?64:0;
   const originY=(anchorY-10-lift)-(bh+17);
+  if(lift){
+    // Lifted above the head: point the tail's tip (three 6px steps from
+    // where it leaves the bubble) straight down at the head, leaning
+    // whichever way leaves room inside the bubble's bottom edge.
+    const headX=anchorX-originX;
+    stepDx=-6;tailAttachX=headX+18;
+    if(tailAttachX>bw-n-4){stepDx=6;tailAttachX=headX-18}
+    tailAttachX=Math.max(n+4,Math.min(bw-n-4,tailAttachX));
+  }
 
   bctx.translate(originX,originY);
   bctx.fillStyle='#fbfbfb';
