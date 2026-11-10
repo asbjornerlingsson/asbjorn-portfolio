@@ -44,3 +44,4 @@
 - Game: intro lines are tied to where the player is walking, not a timer; on phones the lifted speech bubble's tail points at the player (Nov 10).
 - Static About/Contact rebuilt from the Claude Design file: portrait + "I'm Ásbjörn" text, centred "Get in touch" with email and phone icon buttons; game About dialog uses the same text (Nov 10).
 - Game: touch-to-move hint (edge pulse + tapping pixel hand) on touch screens until the first tap; bottom menu in the Arcade select style with the static menu's four sections (icons on phones); intro lines 1–2 before ABOUT with a pause between, line 3 between ABOUT and VEITA (Nov 10).
+- Game: more space between bottom-menu buttons; "+XP" shows on the XP bar itself; "LVL 1" under the avatar; reading every sign shows LEVEL UP and goes to LVL 2 (Nov 10).

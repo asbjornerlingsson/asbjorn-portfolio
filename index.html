@@ -52,8 +52,21 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 }
 .hud-stat{font-family:'Share Tech Mono',monospace;font-size:calc(13px + 5px * var(--rs));color:var(--pip);letter-spacing:1px;text-shadow:0 0 6px var(--pip)}
 .hud-player-label{font-family:'Share Tech Mono',monospace;font-size:calc(18px + 6px * var(--rs));color:var(--pip);letter-spacing:1px;text-shadow:0 0 6px var(--pip)}
-#xp-total-label{opacity:0;transition:opacity 0.3s}
+/* "+100XP" sits on the XP bar itself, just past the end of the pink fill;
+   when there's no room left it moves inside the fill, in black. */
+#xp-track{position:relative}
+#xp-total-label{position:absolute;top:50%;transform:translateY(-50%);font-size:13px;line-height:1;white-space:nowrap;opacity:0;transition:opacity 0.3s,left 0.3s;pointer-events:none}
 #xp-total-label.show{opacity:1}
+#xp-total-label.inside{color:#050E08;text-shadow:none}
+.hud-avatar-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+#hud-level{font-size:calc(12px + 4px * var(--rs))}
+#hud-level.bump{animation:lvl-bump .9s steps(2,end) 3}
+@keyframes lvl-bump{0%{opacity:1}50%{opacity:.2}}
+/* LEVEL UP: flashes across the screen when every sign has been read. */
+#level-up{position:fixed;left:0;right:0;top:42%;transform:translateY(-50%);z-index:260;pointer-events:none;text-align:center;font-family:'VT323',monospace;font-size:clamp(72px,16vw,200px);line-height:1;letter-spacing:.06em;color:#FF2889;text-shadow:0 0 18px #FF2889,0 0 42px rgba(255,40,137,.6);opacity:0;visibility:hidden}
+#level-up.go{visibility:visible;animation:level-up 2.6s ease-out forwards}
+@keyframes level-up{0%{opacity:0;transform:translateY(-50%) scale(.6)}8%{opacity:1;transform:translateY(-50%) scale(1.08)}14%{transform:translateY(-50%) scale(1)}20%,32%,44%,56%{opacity:1}26%,38%,50%{opacity:.15}80%{opacity:1}100%{opacity:0;transform:translateY(-50%) scale(1.04)}}
+@media(prefers-reduced-motion:reduce){#level-up.go{animation:level-up-calm 2.6s forwards}@keyframes level-up-calm{0%,85%{opacity:1}100%{opacity:0}}}
 #hud-avatar-frame{width:calc(67px + 31px * var(--rs));height:calc(61px + 27px * var(--rs));overflow:hidden;flex-shrink:0;background-repeat:no-repeat;image-rendering:pixelated}
 /* Keeps the bar clear of the fixed mode-switch toggle (top:40px;right:40px;
    width:96px) at narrow widths. */
@@ -66,7 +79,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #pip-tabs{
   position:fixed;bottom:0;left:0;right:0;z-index:100;pointer-events:none;
   background:transparent;
-  display:flex;justify-content:center;align-items:center;gap:6px;padding:6px 16px 40px;flex-wrap:wrap;
+  display:flex;justify-content:center;align-items:center;gap:14px;padding:6px 16px 40px;flex-wrap:wrap;
 }
 .pip-tab{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;box-sizing:border-box;border:2px solid transparent;border-radius:4px;background:transparent;font-family:'Share Tech Mono',monospace;font-size:15px;letter-spacing:1px;text-transform:uppercase;color:var(--pip);cursor:pointer;pointer-events:all;-webkit-tap-highlight-color:transparent;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
 .pip-tab:hover{border-color:var(--pip)}
@@ -480,7 +493,10 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   <div id="crt-overlay"></div>
 
   <div id="hud-bar">
-    <div id="hud-avatar-frame"></div>
+    <div class="hud-avatar-col">
+      <div id="hud-avatar-frame"></div>
+      <span class="hud-stat" id="hud-level">LVL 1</span>
+    </div>
     <div style="display:flex;flex-direction:column;gap:6px">
       <span class="hud-player-label">PLAYER 1</span>
       <div style="display:flex;align-items:center;gap:10px">
@@ -489,8 +505,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span class="hud-stat" style="width:32px">XP</span>
-        <div class="hud-bar-track" style="height:16px;background:rgba(255,40,137,0.15);border-radius:0;overflow:hidden"><div id="xp-fill" style="width:0%;height:100%;background:#FF2889;border-radius:0;transition:width 0.3s"></div></div>
-        <span class="hud-stat" id="xp-total-label"></span>
+        <div class="hud-bar-track" id="xp-track" style="height:16px;background:rgba(255,40,137,0.15);border-radius:0;overflow:hidden"><div id="xp-fill" style="width:0%;height:100%;background:#FF2889;border-radius:0;transition:width 0.3s"></div><span class="hud-stat" id="xp-total-label"></span></div>
       </div>
     </div>
   </div>
@@ -550,6 +565,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   <!-- Invisible touch zones for mobile movement -->
   <div id="touch-zone-left"><span class="touch-arrow">◄</span></div>
   <div id="touch-zone-right"><span class="touch-arrow">►</span></div>
+  <div id="level-up" role="status" aria-live="polite">LEVEL UP</div>
   <div id="move-hint" aria-hidden="true"><div class="mh-pulse mh-l"></div><div class="mh-pulse mh-r"></div><div class="mh-hand mh-l"></div><div class="mh-hand mh-r"></div></div>
 
   <!-- Lives inside #game-mode (same stacking context as the HUD, dialog-box
@@ -1392,6 +1408,38 @@ function spawnXPPopup(worldX,y,amount){
   setTimeout(function(){el.remove()},1100);
 }
 
+// Reading every sign fills the XP bar: LEVEL UP flashes across the screen
+// and the player goes to level 2.
+let playerLevel=1,pendingXPLabel=0,pendingLevelUp=false;
+// Shows the "+100XP" label on the bar and, if the bar just filled, the
+// level-up, as soon as no dialog or project popup is covering the screen.
+function flushXPFeedback(){
+  if(dialogOpen||popupOpen)return;
+  if(pendingXPLabel){showXPLabel(pendingXPLabel);pendingXPLabel=0}
+  if(pendingLevelUp){pendingLevelUp=false;setTimeout(levelUp,500)}
+}
+// A brief label on the bar (not a persistent total): just right of the
+// pink fill, or inside it in black when there's no room left.
+function showXPLabel(amount){
+  const totalLabel=document.getElementById('xp-total-label');
+  totalLabel.textContent='+'+amount+'XP';
+  const frac=Math.min(1,totalXP/MAX_XP);
+  const trackW=document.getElementById('xp-track').clientWidth,labelW=totalLabel.offsetWidth,fillW=trackW*frac,pad=4;
+  const inside=fillW+pad+labelW>trackW;
+  totalLabel.classList.toggle('inside',inside);
+  totalLabel.style.left=Math.max(pad,inside?fillW-pad-labelW:fillW+pad)+'px';
+  totalLabel.classList.add('show');
+  clearTimeout(totalLabel._hideTimeout);
+  totalLabel._hideTimeout=setTimeout(function(){totalLabel.classList.remove('show')},2000);
+}
+function levelUp(){
+  playerLevel=2;
+  const lvl=document.getElementById('hud-level');
+  lvl.textContent='LVL '+playerLevel;
+  lvl.classList.remove('bump');void lvl.offsetWidth;lvl.classList.add('bump');
+  const banner=document.getElementById('level-up');
+  banner.classList.remove('go');void banner.offsetWidth;banner.classList.add('go');
+}
 // Grants XP for a zone the first time it's visited, whether triggered by
 // walking up and pressing E (interact()) or clicking a sign from anywhere
 // (openZone()) — shared so both stay in sync.
@@ -1399,13 +1447,13 @@ function grantZoneXP(z){
   if(visitedZones.has(z.label))return;
   visitedZones.add(z.label);
   totalXP+=z.xp;
-  document.getElementById('xp-fill').style.width=Math.min(100,totalXP/MAX_XP*100)+'%';
-  // Show the amount just gained as a brief toast, not a persistent total.
-  const totalLabel=document.getElementById('xp-total-label');
-  totalLabel.textContent='+'+z.xp+'XP';
-  totalLabel.classList.add('show');
-  clearTimeout(totalLabel._hideTimeout);
-  totalLabel._hideTimeout=setTimeout(function(){totalLabel.classList.remove('show')},2000);
+  const frac=Math.min(1,totalXP/MAX_XP);
+  document.getElementById('xp-fill').style.width=(frac*100)+'%';
+  pendingXPLabel=z.xp;
+  if(totalXP>=MAX_XP&&playerLevel===1)pendingLevelUp=true;
+  // The sign's dialog/popup can cover the HUD (on phones it always does),
+  // so the label and any level-up wait until it's closed.
+  setTimeout(flushXPFeedback,0);
   const sb=getSignBounds(z);
   spawnXPPopup(z.x,sb.dy,z.xp);
 }
@@ -1433,7 +1481,7 @@ function updateSwitchStacking(){
   }
 }
 function showDialog(z){activeModalZone=z;const b=document.getElementById('dialog-box');b.querySelector('.dialog-header').textContent=z.header;b.querySelector('.dialog-content').innerHTML=z.content;b.classList.add('visible');dialogOpen=true;positionModal(b,z);updateSwitchStacking()}
-function hideDialog(){document.getElementById('dialog-box').classList.remove('visible');dialogOpen=false;activeModalZone=null;updateSwitchStacking()}
+function hideDialog(){document.getElementById('dialog-box').classList.remove('visible');dialogOpen=false;activeModalZone=null;updateSwitchStacking();flushXPFeedback()}
 function showProject(z){activeModalZone=z;activeProjectImages=z.images||[];const p=document.getElementById('project-popup');
   // Collapsed state content
   p.querySelector('#popup-collapsed .popup-title').textContent=z.title;
@@ -1797,7 +1845,7 @@ function collapseModal(){
   if(activeModalZone)positionModal(p,activeModalZone);
 }
 
-function closePopup(){const p=document.getElementById('project-popup');document.getElementById('popup-image-stack').innerHTML='';p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking()}
+function closePopup(){const p=document.getElementById('project-popup');document.getElementById('popup-image-stack').innerHTML='';p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking();flushXPFeedback()}
 
 // Which menu section a zone belongs to: projects by category
 // (design / illustration), the About and Contact signs by their own tab.
