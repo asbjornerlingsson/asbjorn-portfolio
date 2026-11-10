@@ -51,3 +51,4 @@
 - Game: more space between bottom-menu buttons; "+XP" shows on the XP bar itself; "LVL 1" under the avatar; reading every sign shows LEVEL UP and goes to LVL 2 (Nov 10).
 - Game: the +XP number appears as soon as a sign is opened and rides along with the filling bar; LEVEL UP still waits for the popup to close; LVL label moved down a little (Nov 10).
 - Game: signs in the static version's order (About, Veita, Digital Products, Games, Meniga, Illustrations, Odd Jobs, Wedding, Contact); bottom menu in the same order: About, Interfaces & games, Illustration & designs, Contact (Nov 10).
+- Game on phones: eye-strain popup has a solid background (LVL no longer shows through) and fits the screen; speech bubbles sit centred above the player and move with them, narrower with wide side padding; the selected bottom-menu button shows its name instead of its icon (Nov 10).

@@ -89,9 +89,21 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .pip-tab-ico{display:none}
 .pip-tab-ico svg{display:block}
 @media(max-width:720px){
-  .pip-tab{width:44px;padding:0}
+  /* Icons only, except the selected button, which shows its name. */
+  #pip-tabs{gap:8px}
+  .pip-tab{width:44px;padding:0;font-size:13px;letter-spacing:.5px}
   .pip-tab-lbl{display:none}
   .pip-tab-ico{display:inline-flex}
+  .pip-tab.active{width:auto;padding:0 12px}
+  .pip-tab.active .pip-tab-lbl{display:inline}
+  .pip-tab.active .pip-tab-ico{display:none}
+}
+/* Very small phones (e.g. 320px wide): tighter so the selected name still
+   fits on one row with the three icons. */
+@media(max-width:360px){
+  #pip-tabs{gap:6px;padding-left:8px;padding-right:8px}
+  .pip-tab{width:40px;min-height:40px;font-size:11px}
+  .pip-tab.active{padding:0 8px}
 }
 
 /* Progress boxes — sit above the pip-tabs bar, positioned via JS to align
@@ -401,7 +413,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
    150/200) so an open dialog isn't interrupted by the hint appearing. */
 #mode-hint{
   position:fixed;top:90px;right:40px;z-index:145;
-  width:360px;background:transparent;border:3px solid #FF2889;
+  width:min(360px,calc(100vw - 32px));box-sizing:border-box;background:#050E08;border:3px solid #FF2889;
   padding:24px 32px;opacity:0;pointer-events:none;
   transition:opacity 0.4s;font-family:'Share Tech Mono',monospace;
 }
@@ -421,6 +433,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   border-bottom:10px solid #FF2889;
 }
 #mode-hint-arrow-inner{display:none}
+@media(max-width:480px){#mode-hint{right:16px}#mode-hint-arrow{right:48px}}
 
 #lightbox{position:fixed;inset:0;z-index:800;background:rgba(217,217,217,0.9);display:none;align-items:center;justify-content:center;gap:24px;cursor:pointer}
 #lightbox.visible{display:flex}
@@ -2083,9 +2096,15 @@ function drawSpeechBubble(bctx,text,anchorX,anchorY,side){
   bctx.save();
   bctx.font='16px "Share Tech Mono",monospace';
   const padX=16,n=6,gap=55; // corner notch size + head clearance (clears the centered "PRESS E"/"PLAYER 1" labels)
-  const edgeMargin=16,lineH=20;
-  // Wrap onto more lines when the text is wider than the screen allows.
-  const maxTextW=Math.min(420,bctx.canvas.width-edgeMargin*2-padX*2);
+  const edgeMargin=16,lineH=20,W=bctx.canvas.width;
+  // Narrow screens: the bubble always sits centred above the head (over
+  // the "PRESS E" / "PLAYER 1" labels) and moves with the player, tail and
+  // all. It's kept narrow, with wide padding to each screen edge, so it
+  // fits even while the player is near the left edge at the start.
+  const above=W<600;
+  const sidePad=72;
+  const maxTextW=above?Math.max(120,W-sidePad*2-padX*2):Math.min(420,W-edgeMargin*2-padX*2);
+  // Wrap onto more lines when the text is wider than that.
   const lines=[];
   text.split(' ').forEach(function(word){
     const last=lines.length?lines[lines.length-1]:null;
@@ -2100,21 +2119,21 @@ function drawSpeechBubble(bctx,text,anchorX,anchorY,side){
   // stepDx: which way its steps run from there (mirrors the Figma asset).
   let tailAttachX=lean==='left'?27:bw-27;
   let stepDx=lean==='left'?-6:6;
-  let originX=side==='right'?anchorX+gap:anchorX-gap-bw;
-  const wantX=originX;
-  originX=Math.max(edgeMargin,Math.min(bctx.canvas.width-edgeMargin-bw,originX));
-  // On narrow screens a wide bubble gets pushed back over the head; then
-  // lift it above the "PRESS E" / "PLAYER 1" labels instead of covering them.
-  const lift=originX!==wantX&&originX<anchorX+gap&&originX+bw>anchorX-gap?64:0;
-  const originY=(anchorY-10-lift)-(bh+17);
-  if(lift){
-    // Lifted above the head: point the tail's tip (three 6px steps from
-    // where it leaves the bubble) straight down at the head, leaning
-    // whichever way leaves room inside the bubble's bottom edge.
-    const headX=anchorX-originX;
-    stepDx=-6;tailAttachX=headX+18;
-    if(tailAttachX>bw-n-4){stepDx=6;tailAttachX=headX-18}
-    tailAttachX=Math.max(n+4,Math.min(bw-n-4,tailAttachX));
+  let originX,originY;
+  if(above){
+    // Centred on the head; the tail leaves the bubble 18px right of centre
+    // and its three 6px steps end right above the head.
+    originX=anchorX-bw/2;
+    // Only as a last resort (right at the world's edges) keep it on screen.
+    originX=Math.max(edgeMargin,Math.min(W-edgeMargin-bw,originX));
+    originY=(anchorY-10-64)-(bh+17);
+    stepDx=-6;
+    tailAttachX=Math.max(n+4+18,Math.min(bw-n-4,anchorX-originX+18));
+  }else{
+    // Wide screens: beside the head, on the given side.
+    originX=side==='right'?anchorX+gap:anchorX-gap-bw;
+    originX=Math.max(edgeMargin,Math.min(W-edgeMargin-bw,originX));
+    originY=(anchorY-10)-(bh+17);
   }
 
   bctx.translate(originX,originY);
