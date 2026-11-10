@@ -61,7 +61,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 
 /* Pip tabs */
 /* Game menu, "Arcade select": mono caps; the current section gets a pink
-   block and a ▶ cursor, hover draws a pink outline. Same four sections as
+   block, hover draws a pink outline. Same four sections as
    the static version's menu; icons only on phones. */
 #pip-tabs{
   position:fixed;bottom:0;left:0;right:0;z-index:100;pointer-events:none;
@@ -71,7 +71,6 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .pip-tab{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;box-sizing:border-box;border:2px solid transparent;border-radius:4px;background:transparent;font-family:'Share Tech Mono',monospace;font-size:15px;letter-spacing:1px;text-transform:uppercase;color:var(--pip);cursor:pointer;pointer-events:all;-webkit-tap-highlight-color:transparent;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
 .pip-tab:hover{border-color:var(--pip)}
 .pip-tab.active{background:var(--pip);border-color:var(--pip);color:#050E08}
-.pip-tab.active .pip-tab-lbl::before{content:'\25B6\00A0'}
 .pip-tab-ico{display:none}
 .pip-tab-ico svg{display:block}
 @media(max-width:720px){
@@ -1115,11 +1114,13 @@ const INTRO_LINES=[
   ["I'm a Digital product designer and illustrator",720,1170],
   ["Let's look at some of my stuff",ZONES[0].x+SIGN_REACH+20,ZONES[1].x-SIGN_REACH-20]
 ];
-let introDone=false,introLine=null;
+let introDone=false,introLine=null,playerHasWalked=false;
 // Called every frame. The intro ends for good once the player reaches the
 // second sign (or teleports somewhere).
 function updateIntro(){
-  if(introDone)return;
+  // Silent until the visitor has walked the character themselves.
+  if(player.walking)playerHasWalked=true;
+  if(introDone||!playerHasWalked)return;
   if(player.x>=ZONES[1].x-SIGN_REACH){endIntro();return}
   const line=INTRO_LINES.find(l=>player.x>=l[1]&&player.x<l[2]);
   if(line){
