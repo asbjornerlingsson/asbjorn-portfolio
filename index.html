@@ -94,8 +94,11 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
      opens, and the row slides along with them. */
   #pip-tabs{gap:8px;flex-wrap:nowrap}
   .pip-tab{gap:0;padding:0 10px;font-size:13px;letter-spacing:.5px;transition:background .3s,color .3s,border-color .3s,padding .45s cubic-bezier(.4,0,.2,1)}
-  .pip-tab-lbl{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .45s cubic-bezier(.4,0,.2,1),opacity .15s ease}
-  .pip-tab-ico{display:inline-flex;width:20px;opacity:1;overflow:hidden;transition:width .45s cubic-bezier(.4,0,.2,1),opacity .2s ease .25s}
+  /* Flex + centred: while it's narrower than the name, the name overflows
+     both sides equally, so it opens (and closes) from the middle. Same for
+     the icon. */
+  .pip-tab-lbl{display:inline-flex;justify-content:center;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .45s cubic-bezier(.4,0,.2,1),opacity .15s ease}
+  .pip-tab-ico{display:inline-flex;justify-content:center;width:20px;opacity:1;overflow:hidden;transition:width .45s cubic-bezier(.4,0,.2,1),opacity .2s ease .25s}
   .pip-tab.active{padding:0 12px}
   /* --w is the name's real width (measureTabLabels), so it opens and
      closes at the same pace as the button next to it. */
@@ -1876,7 +1879,13 @@ function closePopup(){const p=document.getElementById('project-popup');document.
 // Stores each bottom-menu name's real width as --w, so on phones the
 // selected button's name animates open/closed by exactly its own width.
 function measureTabLabels(){
-  document.querySelectorAll('.pip-tab-lbl').forEach(l=>l.style.setProperty('--w',Math.ceil(l.scrollWidth)+'px'));
+  document.querySelectorAll('.pip-tab-lbl').forEach(l=>{
+    // Centred overflow doesn't count toward scrollWidth, so measure the
+    // name with the clamp lifted for a moment.
+    l.style.maxWidth='none';
+    l.style.setProperty('--w',Math.ceil(l.getBoundingClientRect().width)+'px');
+    l.style.maxWidth='';
+  });
 }
 window.addEventListener('resize',measureTabLabels);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(measureTabLabels);
