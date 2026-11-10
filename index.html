@@ -89,20 +89,24 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .pip-tab-ico{display:none}
 .pip-tab-ico svg{display:block}
 @media(max-width:720px){
-  /* Icons only, except the selected button, which shows its name. */
-  #pip-tabs{gap:8px}
-  .pip-tab{width:44px;padding:0;font-size:13px;letter-spacing:.5px}
-  .pip-tab-lbl{display:none}
-  .pip-tab-ico{display:inline-flex}
-  .pip-tab.active{width:auto;padding:0 12px}
-  .pip-tab.active .pip-tab-lbl{display:inline}
-  .pip-tab.active .pip-tab-ico{display:none}
+  /* Icons only, except the selected button, which shows its name. The
+     switch is fluid: the old button's name folds away as the new one's
+     opens, and the row slides along with them. */
+  #pip-tabs{gap:8px;flex-wrap:nowrap}
+  .pip-tab{gap:0;padding:0 10px;font-size:13px;letter-spacing:.5px;transition:background .3s,color .3s,border-color .3s,padding .45s cubic-bezier(.4,0,.2,1)}
+  .pip-tab-lbl{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .45s cubic-bezier(.4,0,.2,1),opacity .15s ease}
+  .pip-tab-ico{display:inline-flex;width:20px;opacity:1;overflow:hidden;transition:width .45s cubic-bezier(.4,0,.2,1),opacity .2s ease .25s}
+  .pip-tab.active{padding:0 12px}
+  /* --w is the name's real width (measureTabLabels), so it opens and
+     closes at the same pace as the button next to it. */
+  .pip-tab.active .pip-tab-lbl{max-width:var(--w,240px);opacity:1;transition:max-width .45s cubic-bezier(.4,0,.2,1),opacity .25s ease .2s}
+  .pip-tab.active .pip-tab-ico{width:0;opacity:0;transition:width .45s cubic-bezier(.4,0,.2,1),opacity .12s ease}
 }
 /* Very small phones (e.g. 320px wide): tighter so the selected name still
    fits on one row with the three icons. */
 @media(max-width:360px){
   #pip-tabs{gap:6px;padding-left:8px;padding-right:8px}
-  .pip-tab{width:40px;min-height:40px;font-size:11px}
+  .pip-tab{padding:0 8px;min-height:40px;font-size:11px}
   .pip-tab.active{padding:0 8px}
 }
 
@@ -200,20 +204,21 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .touch-arrow.visible{color:rgba(255,40,137,0.2)}
 
 /* Touch screens: how-to-move hint ("Edge pulse"). The left and right edges
-   flash pink in turn while a pixel hand taps each one. Plays once at the
-   start of the game (left, then right), or stops at the first tap to walk. */
+   flash pink in turn while a pixel hand taps each one. Plays at the start
+   of the game, twice per side (left, right, left, right), or stops at the
+   first tap to walk. */
 #move-hint{position:fixed;inset:0;z-index:88;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
 #move-hint.visible{opacity:1;visibility:visible;transition:opacity .4s}
-.mh-pulse{position:absolute;top:0;bottom:0;width:72px;background:#FF2889;opacity:0;animation:mh-pulse 2.4s ease-in-out both}
+.mh-pulse{position:absolute;top:0;bottom:0;width:72px;background:#FF2889;opacity:0;animation:mh-pulse 2.4s ease-in-out 2 both}
 .mh-pulse.mh-l{left:0}
 .mh-pulse.mh-r{right:0;animation-delay:1.2s}
-.mh-hand{position:absolute;top:56%;opacity:0;animation:mh-tap 2.4s ease-in-out both}
+.mh-hand{position:absolute;top:56%;opacity:0;animation:mh-tap 2.4s ease-in-out 2 both}
 .mh-hand.mh-l{left:22px}
 .mh-hand.mh-r{right:22px;animation-delay:1.2s}
 .mh-hand svg{display:block}
 @keyframes mh-pulse{0%,100%{opacity:0}20%{opacity:.32}45%{opacity:0}}
 @keyframes mh-tap{0%,100%{opacity:0;transform:translateY(10px) scale(1)}8%{opacity:1;transform:translateY(0) scale(1)}18%{transform:translateY(0) scale(.82)}28%{transform:translateY(0) scale(1)}42%{opacity:1}50%{opacity:0}}
-@media(prefers-reduced-motion:reduce){.mh-pulse{opacity:.25;animation:none}.mh-hand{opacity:1;animation:none}}
+@media(prefers-reduced-motion:reduce){.mh-pulse{opacity:.25;animation:none}.mh-hand{opacity:1;animation:none}.pip-tab,.pip-tab-lbl,.pip-tab-ico{transition:none!important}}
 
 /* Mode toggle button */
 
@@ -1103,7 +1108,7 @@ let modeHintShown=false,modeHintTimer=0;
 function updateModeHintTimer(){
   if(!modeHintShown && !player.sitting){
     modeHintTimer+=0.016;
-    if(modeHintTimer>15){
+    if(modeHintTimer>30){ // seconds of play before the eye-strain hint
       document.getElementById('mode-hint').classList.add('visible');
       modeHintShown=true;
     }
@@ -1384,8 +1389,8 @@ function showMoveHint(){
   const el=document.getElementById('move-hint');
   el.querySelectorAll('.mh-hand').forEach(h=>{if(!h.firstChild)h.innerHTML=HAND_SVG});
   el.classList.add('visible');
-  // One pass: the right side starts 1.2s in and runs 2.4s.
-  setTimeout(hideMoveHint,3600);
+  // Two passes per side: the right side starts 1.2s in and runs 2 x 2.4s.
+  setTimeout(hideMoveHint,6000);
 }
 function hideMoveHint(){
   if(moveHintDone)return;
@@ -1868,6 +1873,14 @@ function collapseModal(){
 
 function closePopup(){const p=document.getElementById('project-popup');document.getElementById('popup-image-stack').innerHTML='';p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking();flushXPFeedback()}
 
+// Stores each bottom-menu name's real width as --w, so on phones the
+// selected button's name animates open/closed by exactly its own width.
+function measureTabLabels(){
+  document.querySelectorAll('.pip-tab-lbl').forEach(l=>l.style.setProperty('--w',Math.ceil(l.scrollWidth)+'px'));
+}
+window.addEventListener('resize',measureTabLabels);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(measureTabLabels);
+measureTabLabels();
 // Which menu section a zone belongs to: projects by category
 // (design / illustration), the About and Contact signs by their own tab.
 function zoneSection(z){return z.type==='project'?z.cat:z.tab}
