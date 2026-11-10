@@ -89,9 +89,28 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .pip-tab-ico{display:none}
 .pip-tab-ico svg{display:block}
 @media(max-width:720px){
-  .pip-tab{width:44px;padding:0}
-  .pip-tab-lbl{display:none}
-  .pip-tab-ico{display:inline-flex}
+  /* Icons only, except the selected button, which shows its name.
+     Selecting: the icon fades out while the button widens, and the name
+     fades in over the end of the widening. Deselecting: the name fades out, then the icon fades back in
+     while the button narrows. Both run on the same clock (the 0.15s swap,
+     then the 0.45s resize), so the row trades width without wrapping.
+     The icon floats in the middle; the name's box (at least the icon's
+     20px) sets the button's width. */
+  #pip-tabs{gap:8px;flex-wrap:nowrap}
+  .pip-tab{position:relative;gap:0;padding:0 10px;font-size:13px;letter-spacing:.5px;transition:background .3s,color .3s,border-color .3s,padding .45s cubic-bezier(.4,0,.2,1) .15s}
+  .pip-tab-lbl{display:inline-flex;justify-content:center;max-width:20px;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .15s ease}
+  .pip-tab-ico{display:inline-flex;justify-content:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;opacity:1;transition:opacity .45s ease .15s}
+  .pip-tab.active{padding:0 12px}
+  /* --w is the name's real width (measureTabLabels). */
+  .pip-tab.active .pip-tab-lbl{max-width:var(--w,240px);opacity:1;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .25s ease .4s}
+  .pip-tab.active .pip-tab-ico{opacity:0;transition:opacity .4s ease .15s}
+}
+/* Very small phones (e.g. 320px wide): tighter so the selected name still
+   fits on one row with the three icons. */
+@media(max-width:360px){
+  #pip-tabs{gap:6px;padding-left:8px;padding-right:8px}
+  .pip-tab{padding:0 8px;min-height:40px;font-size:11px}
+  .pip-tab.active{padding:0 8px}
 }
 
 /* Progress boxes — sit above the pip-tabs bar, positioned via JS to align
@@ -176,32 +195,23 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 @media(max-width:768px){#touch-zone-left,#touch-zone-right{display:block}}
 @media(pointer:coarse){#touch-zone-left,#touch-zone-right{display:block}}
 
-/* Subtle directional arrows that appear on touch */
-.touch-arrow{
-  position:absolute;top:50%;transform:translateY(-50%);
-  font-family:'VT323',monospace;font-size:32px;
-  color:rgba(255,40,137,0);transition:color 0.15s;
-  pointer-events:none;
-}
-#touch-zone-left .touch-arrow{left:16px}
-#touch-zone-right .touch-arrow{right:16px}
-.touch-arrow.visible{color:rgba(255,40,137,0.2)}
 
 /* Touch screens: how-to-move hint ("Edge pulse"). The left and right edges
-   flash pink in turn while a pixel hand taps each one. Loops from the start
-   of the game until the first tap to walk, then fades out. */
+   flash pink in turn while a pixel hand taps each one. Plays at the start
+   of the game, twice per side (left, right, left, right), or stops at the
+   first tap to walk. */
 #move-hint{position:fixed;inset:0;z-index:88;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
 #move-hint.visible{opacity:1;visibility:visible;transition:opacity .4s}
-.mh-pulse{position:absolute;top:0;bottom:0;width:72px;background:#FF2889;opacity:0;animation:mh-pulse 2.4s ease-in-out infinite}
+.mh-pulse{position:absolute;top:0;bottom:0;width:72px;background:#FF2889;opacity:0;animation:mh-pulse 2.4s ease-in-out 2 both}
 .mh-pulse.mh-l{left:0}
 .mh-pulse.mh-r{right:0;animation-delay:1.2s}
-.mh-hand{position:absolute;top:56%;opacity:0;animation:mh-tap 2.4s ease-in-out infinite}
-.mh-hand.mh-l{left:14px}
-.mh-hand.mh-r{right:14px;animation-delay:1.2s}
+.mh-hand{position:absolute;top:56%;opacity:0;animation:mh-tap 2.4s ease-in-out 2 both}
+.mh-hand.mh-l{left:22px}
+.mh-hand.mh-r{right:22px;animation-delay:1.2s}
 .mh-hand svg{display:block}
 @keyframes mh-pulse{0%,100%{opacity:0}20%{opacity:.32}45%{opacity:0}}
 @keyframes mh-tap{0%,100%{opacity:0;transform:translateY(10px) scale(1)}8%{opacity:1;transform:translateY(0) scale(1)}18%{transform:translateY(0) scale(.82)}28%{transform:translateY(0) scale(1)}42%{opacity:1}50%{opacity:0}}
-@media(prefers-reduced-motion:reduce){.mh-pulse{opacity:.25;animation:none}.mh-hand{opacity:1;animation:none}}
+@media(prefers-reduced-motion:reduce){.mh-pulse{opacity:.25;animation:none}.mh-hand{opacity:1;animation:none}.pip-tab,.pip-tab-lbl,.pip-tab-ico{transition:none!important}}
 
 /* Mode toggle button */
 
@@ -401,7 +411,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
    150/200) so an open dialog isn't interrupted by the hint appearing. */
 #mode-hint{
   position:fixed;top:90px;right:40px;z-index:145;
-  width:360px;background:transparent;border:3px solid #FF2889;
+  width:min(360px,calc(100vw - 32px));box-sizing:border-box;background:#050E08;border:3px solid #FF2889;
   padding:24px 32px;opacity:0;pointer-events:none;
   transition:opacity 0.4s;font-family:'Share Tech Mono',monospace;
 }
@@ -421,6 +431,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   border-bottom:10px solid #FF2889;
 }
 #mode-hint-arrow-inner{display:none}
+@media(max-width:480px){#mode-hint{right:16px}#mode-hint-arrow{right:48px}}
 
 #lightbox{position:fixed;inset:0;z-index:800;background:rgba(217,217,217,0.9);display:none;align-items:center;justify-content:center;gap:24px;cursor:pointer}
 #lightbox.visible{display:flex}
@@ -565,8 +576,8 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   <div id="xp-popup-layer"></div>
 
   <!-- Invisible touch zones for mobile movement -->
-  <div id="touch-zone-left"><span class="touch-arrow">◄</span></div>
-  <div id="touch-zone-right"><span class="touch-arrow">►</span></div>
+  <div id="touch-zone-left"></div>
+  <div id="touch-zone-right"></div>
   <div id="level-up" role="status" aria-live="polite">LEVEL UP</div>
   <div id="move-hint" aria-hidden="true"><div class="mh-pulse mh-l"></div><div class="mh-pulse mh-r"></div><div class="mh-hand mh-l"></div><div class="mh-hand mh-r"></div></div>
 
@@ -1090,7 +1101,7 @@ let modeHintShown=false,modeHintTimer=0;
 function updateModeHintTimer(){
   if(!modeHintShown && !player.sitting){
     modeHintTimer+=0.016;
-    if(modeHintTimer>15){
+    if(modeHintTimer>30){ // seconds of play before the eye-strain hint
       document.getElementById('mode-hint').classList.add('visible');
       modeHintShown=true;
     }
@@ -1177,8 +1188,6 @@ function init(){
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;if(playerCanvas){playerCanvas.width=window.innerWidth;playerCanvas.height=window.innerHeight;}player.y=canvas.height*GROUND_Y_RATIO}
 
 function setupTouch(){
-  const arrowL=document.querySelector('#touch-zone-left .touch-arrow');
-  const arrowR=document.querySelector('#touch-zone-right .touch-arrow');
 
   // Track active movement touches by ID
   let moveTouches={};
@@ -1257,12 +1266,12 @@ function setupTouch(){
         // Left side — walk left
         hideMoveHint();
         moveTouches[touch.identifier]='left';
-        touchLeft=true;arrowL.classList.add('visible');
+        touchLeft=true;
       }else{
         // Right side — walk right
         hideMoveHint();
         moveTouches[touch.identifier]='right';
-        touchRight=true;arrowR.classList.add('visible');
+        touchRight=true;
       }
     }
   },{passive:false});
@@ -1271,8 +1280,8 @@ function setupTouch(){
     if(currentMode==='browse')return;
     for(let i=0;i<e.changedTouches.length;i++){
       const id=e.changedTouches[i].identifier;
-      if(moveTouches[id]==='left'){touchLeft=false;arrowL.classList.remove('visible')}
-      if(moveTouches[id]==='right'){touchRight=false;arrowR.classList.remove('visible')}
+      if(moveTouches[id]==='left'){touchLeft=false}
+      if(moveTouches[id]==='right'){touchRight=false}
       delete moveTouches[id];
     }
   },{passive:false});
@@ -1280,8 +1289,8 @@ function setupTouch(){
   document.addEventListener('touchcancel',e=>{
     for(let i=0;i<e.changedTouches.length;i++){
       const id=e.changedTouches[i].identifier;
-      if(moveTouches[id]==='left'){touchLeft=false;arrowL.classList.remove('visible')}
-      if(moveTouches[id]==='right'){touchRight=false;arrowR.classList.remove('visible')}
+      if(moveTouches[id]==='left'){touchLeft=false}
+      if(moveTouches[id]==='right'){touchRight=false}
       delete moveTouches[id];
     }
   },{passive:false});
@@ -1360,10 +1369,10 @@ function onMouseDown(e){
 function startGame(){if(gameStarted)return;gameStarted=true;document.getElementById('intro-overlay').classList.add('hidden');showMoveHint()}
 
 // The how-to-move hint (touch screens only, see #move-hint). The pixel
-// hand is an 11x14 sprite: k = outline, w = fill.
+// hand is an 11x14 sprite: k = outline, w = fill (the theme's pink).
 const HAND_SPRITE=['...kk......','..kwwk.....','..kwwk.....','..kwwk.....','..kwwkkkk..','..kwwkwwkk.','kkkkwwwwwwk','kwwkwwwwwwk','kwwwwwwwwwk','.kwwwwwwwwk','.kwwwwwwwk.','..kwwwwwwk.','..kwwwwwk..','..kkkkkk...'];
-const HAND_SVG='<svg width="44" height="56" viewBox="0 0 11 14" shape-rendering="crispEdges" aria-hidden="true">'+
-  HAND_SPRITE.map((row,y)=>row.split('').map((c,x)=>c==='.'?'':'<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(c==='k'?'#050E08':'#fbfbfb')+'"></rect>').join('')).join('')+'</svg>';
+const HAND_SVG='<svg width="28" height="36" viewBox="0 0 11 14" shape-rendering="crispEdges" aria-hidden="true">'+
+  HAND_SPRITE.map((row,y)=>row.split('').map((c,x)=>c==='.'?'':'<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(c==='k'?'#050E08':'#FF2889')+'"></rect>').join('')).join('')+'</svg>';
 let moveHintDone=false;
 function showMoveHint(){
   const touch=window.matchMedia('(pointer:coarse)').matches||window.matchMedia('(max-width:768px)').matches;
@@ -1371,6 +1380,8 @@ function showMoveHint(){
   const el=document.getElementById('move-hint');
   el.querySelectorAll('.mh-hand').forEach(h=>{if(!h.firstChild)h.innerHTML=HAND_SVG});
   el.classList.add('visible');
+  // Two passes per side: the right side starts 1.2s in and runs 2 x 2.4s.
+  setTimeout(hideMoveHint,6000);
 }
 function hideMoveHint(){
   if(moveHintDone)return;
@@ -1853,6 +1864,20 @@ function collapseModal(){
 
 function closePopup(){const p=document.getElementById('project-popup');document.getElementById('popup-image-stack').innerHTML='';p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking();flushXPFeedback()}
 
+// Stores each bottom-menu name's real width as --w, so on phones the
+// selected button's name animates open/closed by exactly its own width.
+function measureTabLabels(){
+  document.querySelectorAll('.pip-tab-lbl').forEach(l=>{
+    // Centred overflow doesn't count toward scrollWidth, so measure the
+    // name with the clamp lifted for a moment.
+    l.style.maxWidth='none';
+    l.style.setProperty('--w',Math.ceil(l.getBoundingClientRect().width)+'px');
+    l.style.maxWidth='';
+  });
+}
+window.addEventListener('resize',measureTabLabels);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(measureTabLabels);
+measureTabLabels();
 // Which menu section a zone belongs to: projects by category
 // (design / illustration), the About and Contact signs by their own tab.
 function zoneSection(z){return z.type==='project'?z.cat:z.tab}
@@ -2083,9 +2108,15 @@ function drawSpeechBubble(bctx,text,anchorX,anchorY,side){
   bctx.save();
   bctx.font='16px "Share Tech Mono",monospace';
   const padX=16,n=6,gap=55; // corner notch size + head clearance (clears the centered "PRESS E"/"PLAYER 1" labels)
-  const edgeMargin=16,lineH=20;
-  // Wrap onto more lines when the text is wider than the screen allows.
-  const maxTextW=Math.min(420,bctx.canvas.width-edgeMargin*2-padX*2);
+  const edgeMargin=16,lineH=20,W=bctx.canvas.width;
+  // Narrow screens: the bubble always sits centred above the head (over
+  // the "PRESS E" / "PLAYER 1" labels) and moves with the player, tail and
+  // all. It's kept narrow, with wide padding to each screen edge, so it
+  // fits even while the player is near the left edge at the start.
+  const above=W<600;
+  const sidePad=72;
+  const maxTextW=above?Math.max(120,W-sidePad*2-padX*2):Math.min(420,W-edgeMargin*2-padX*2);
+  // Wrap onto more lines when the text is wider than that.
   const lines=[];
   text.split(' ').forEach(function(word){
     const last=lines.length?lines[lines.length-1]:null;
@@ -2100,21 +2131,21 @@ function drawSpeechBubble(bctx,text,anchorX,anchorY,side){
   // stepDx: which way its steps run from there (mirrors the Figma asset).
   let tailAttachX=lean==='left'?27:bw-27;
   let stepDx=lean==='left'?-6:6;
-  let originX=side==='right'?anchorX+gap:anchorX-gap-bw;
-  const wantX=originX;
-  originX=Math.max(edgeMargin,Math.min(bctx.canvas.width-edgeMargin-bw,originX));
-  // On narrow screens a wide bubble gets pushed back over the head; then
-  // lift it above the "PRESS E" / "PLAYER 1" labels instead of covering them.
-  const lift=originX!==wantX&&originX<anchorX+gap&&originX+bw>anchorX-gap?64:0;
-  const originY=(anchorY-10-lift)-(bh+17);
-  if(lift){
-    // Lifted above the head: point the tail's tip (three 6px steps from
-    // where it leaves the bubble) straight down at the head, leaning
-    // whichever way leaves room inside the bubble's bottom edge.
-    const headX=anchorX-originX;
-    stepDx=-6;tailAttachX=headX+18;
-    if(tailAttachX>bw-n-4){stepDx=6;tailAttachX=headX-18}
-    tailAttachX=Math.max(n+4,Math.min(bw-n-4,tailAttachX));
+  let originX,originY;
+  if(above){
+    // Centred on the head; the tail leaves the bubble 18px right of centre
+    // and its three 6px steps end right above the head.
+    originX=anchorX-bw/2;
+    // Only as a last resort (right at the world's edges) keep it on screen.
+    originX=Math.max(edgeMargin,Math.min(W-edgeMargin-bw,originX));
+    originY=(anchorY-10-64)-(bh+17);
+    stepDx=-6;
+    tailAttachX=Math.max(n+4+18,Math.min(bw-n-4,anchorX-originX+18));
+  }else{
+    // Wide screens: beside the head, on the given side.
+    originX=side==='right'?anchorX+gap:anchorX-gap-bw;
+    originX=Math.max(edgeMargin,Math.min(W-edgeMargin-bw,originX));
+    originY=(anchorY-10)-(bh+17);
   }
 
   bctx.translate(originX,originY);
