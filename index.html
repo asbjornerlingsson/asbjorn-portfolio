@@ -52,23 +52,47 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 }
 .hud-stat{font-family:'Share Tech Mono',monospace;font-size:calc(13px + 5px * var(--rs));color:var(--pip);letter-spacing:1px;text-shadow:0 0 6px var(--pip)}
 .hud-player-label{font-family:'Share Tech Mono',monospace;font-size:calc(18px + 6px * var(--rs));color:var(--pip);letter-spacing:1px;text-shadow:0 0 6px var(--pip)}
-#xp-total-label{opacity:0;transition:opacity 0.3s}
+/* "+100XP" sits on the XP bar itself, just past the end of the pink fill;
+   when there's no room left it moves inside the fill, in black. */
+#xp-track{position:relative}
+#xp-total-label{position:absolute;top:50%;transform:translateY(-50%);font-size:13px;line-height:1;white-space:nowrap;opacity:0;transition:opacity 0.3s,left 0.6s cubic-bezier(.25,.8,.3,1);pointer-events:none}
+/* Placing it at the old end of the fill, before it rides along. */
+#xp-total-label.no-move{transition:opacity 0.3s}
 #xp-total-label.show{opacity:1}
+#xp-total-label.inside{color:#050E08;text-shadow:none}
+.hud-avatar-col{display:flex;flex-direction:column;align-items:center;gap:11px;flex-shrink:0}
+#hud-level{font-size:calc(12px + 4px * var(--rs))}
+#hud-level.bump{animation:lvl-bump .9s steps(2,end) 3}
+@keyframes lvl-bump{0%{opacity:1}50%{opacity:.2}}
+/* LEVEL UP: flashes across the screen when every sign has been read. */
+#level-up{position:fixed;left:0;right:0;top:42%;transform:translateY(-50%);z-index:260;pointer-events:none;text-align:center;font-family:'VT323',monospace;font-size:clamp(72px,16vw,200px);line-height:1;letter-spacing:.06em;color:#FF2889;text-shadow:0 0 18px #FF2889,0 0 42px rgba(255,40,137,.6);opacity:0;visibility:hidden}
+#level-up.go{visibility:visible;animation:level-up 2.6s ease-out forwards}
+@keyframes level-up{0%{opacity:0;transform:translateY(-50%) scale(.6)}8%{opacity:1;transform:translateY(-50%) scale(1.08)}14%{transform:translateY(-50%) scale(1)}20%,32%,44%,56%{opacity:1}26%,38%,50%{opacity:.15}80%{opacity:1}100%{opacity:0;transform:translateY(-50%) scale(1.04)}}
+@media(prefers-reduced-motion:reduce){#level-up.go{animation:level-up-calm 2.6s forwards}@keyframes level-up-calm{0%,85%{opacity:1}100%{opacity:0}}}
 #hud-avatar-frame{width:calc(67px + 31px * var(--rs));height:calc(61px + 27px * var(--rs));overflow:hidden;flex-shrink:0;background-repeat:no-repeat;image-rendering:pixelated}
 /* Keeps the bar clear of the fixed mode-switch toggle (top:40px;right:40px;
    width:96px) at narrow widths. */
 .hud-bar-track{width:min(calc(80px + 120px * var(--rs)), calc(26vw + 14vw * var(--rs)))}
 
 /* Pip tabs */
+/* Game menu, "Arcade select": mono caps; the current section gets a pink
+   block, hover draws a pink outline. Same four sections as
+   the static version's menu; icons only on phones. */
 #pip-tabs{
   position:fixed;bottom:0;left:0;right:0;z-index:100;pointer-events:none;
   background:transparent;
-  display:flex;justify-content:center;gap:0;padding:6px 0 40px 0;
+  display:flex;justify-content:center;align-items:center;gap:14px;padding:6px 16px 40px;flex-wrap:wrap;
 }
-.pip-tab{font-family:'VT323',monospace;font-size:calc(19px + 5px * var(--rs));color:var(--pip-dim);letter-spacing:calc(1px + 1px * var(--rs));padding:4px calc(10px + 8px * var(--rs));position:relative;cursor:pointer;pointer-events:all;-webkit-tap-highlight-color:transparent}
-.pip-tab.active{color:var(--pip);text-shadow:0 0 8px var(--pip)}
-.pip-tab.active::after{content:'';position:absolute;bottom:-2px;left:12px;right:12px;height:1.5px;background:var(--pip);box-shadow:0 0 6px var(--pip)}
-.pip-tab-sep{color:var(--pip-dim);padding:4px 0;font-size:15px;font-family:'VT323',monospace}
+.pip-tab{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;box-sizing:border-box;border:2px solid transparent;border-radius:4px;background:transparent;font-family:'Share Tech Mono',monospace;font-size:15px;letter-spacing:1px;text-transform:uppercase;color:var(--pip);cursor:pointer;pointer-events:all;-webkit-tap-highlight-color:transparent;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.pip-tab:hover{border-color:var(--pip)}
+.pip-tab.active{background:var(--pip);border-color:var(--pip);color:#050E08}
+.pip-tab-ico{display:none}
+.pip-tab-ico svg{display:block}
+@media(max-width:720px){
+  .pip-tab{width:44px;padding:0}
+  .pip-tab-lbl{display:none}
+  .pip-tab-ico{display:inline-flex}
+}
 
 /* Progress boxes — sit above the pip-tabs bar, positioned via JS to align
    with each tab (1 box over ABOUT, 3 over WORK, 1 over CONTACT). */
@@ -162,6 +186,22 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #touch-zone-left .touch-arrow{left:16px}
 #touch-zone-right .touch-arrow{right:16px}
 .touch-arrow.visible{color:rgba(255,40,137,0.2)}
+
+/* Touch screens: how-to-move hint ("Edge pulse"). The left and right edges
+   flash pink in turn while a pixel hand taps each one. Loops from the start
+   of the game until the first tap to walk, then fades out. */
+#move-hint{position:fixed;inset:0;z-index:88;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
+#move-hint.visible{opacity:1;visibility:visible;transition:opacity .4s}
+.mh-pulse{position:absolute;top:0;bottom:0;width:72px;background:#FF2889;opacity:0;animation:mh-pulse 2.4s ease-in-out infinite}
+.mh-pulse.mh-l{left:0}
+.mh-pulse.mh-r{right:0;animation-delay:1.2s}
+.mh-hand{position:absolute;top:56%;opacity:0;animation:mh-tap 2.4s ease-in-out infinite}
+.mh-hand.mh-l{left:14px}
+.mh-hand.mh-r{right:14px;animation-delay:1.2s}
+.mh-hand svg{display:block}
+@keyframes mh-pulse{0%,100%{opacity:0}20%{opacity:.32}45%{opacity:0}}
+@keyframes mh-tap{0%,100%{opacity:0;transform:translateY(10px) scale(1)}8%{opacity:1;transform:translateY(0) scale(1)}18%{transform:translateY(0) scale(.82)}28%{transform:translateY(0) scale(1)}42%{opacity:1}50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.mh-pulse{opacity:.25;animation:none}.mh-hand{opacity:1;animation:none}}
 
 /* Mode toggle button */
 
@@ -262,16 +302,22 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 @media(prefers-reduced-motion:reduce){.bw-card-media img,.bw-card-title{transition:none}}
 .bw-card-what{font-size:15px;line-height:1.55;color:var(--muted);margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
-.bw-about{max-width:720px}
-.bw-about-title{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-0.02em;margin-bottom:18px}
+.bw-about{display:flex;flex-wrap:wrap;gap:48px 56px;align-items:flex-start}
+#bw-about.bw-section{padding-top:112px}
+.bw-portrait{flex:1 1 340px;max-width:460px}
+.bw-portrait-ph{aspect-ratio:4/5;border-radius:20px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--muted)}
+.bw-portrait img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:20px}
+.bw-about-text{flex:999 1 480px;min-width:0}
+.bw-about-title{font-size:clamp(32px,4vw,44px);font-weight:800;letter-spacing:-0.03em;line-height:1.05;margin-bottom:28px}
 .bw-about p{font-size:19px;line-height:1.7}
-.bw-about p+p{margin-top:16px}
-.bw-contact{list-style:none;max-width:720px}
-.bw-contact li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:18px 0;border-top:1px solid var(--line);font-size:17px}
-.bw-contact li:last-child{border-bottom:1px solid var(--line)}
-.bw-contact-k{font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
-.bw-contact a{text-decoration:none;font-weight:600;overflow-wrap:anywhere;text-align:right}
-.bw-contact a:hover{color:var(--muted)}
+.bw-about p+p{margin-top:18px}
+/* Contact: a centred heading over two big icon buttons (email, phone). */
+#bw-contact.bw-section{min-height:560px;padding-top:160px;box-sizing:border-box}
+.bw-contact-title{font-size:clamp(32px,4vw,44px);font-weight:800;letter-spacing:-0.03em;text-align:center;margin-bottom:40px}
+.bw-contact-btns{display:flex;flex-wrap:wrap;gap:20px;justify-content:center}
+#browse-mode .bw-ibtn{display:inline-flex;align-items:center;justify-content:center;width:136px;height:104px;border-radius:24px;border:1.5px solid var(--ink);box-sizing:border-box;background:transparent;color:var(--ink);text-decoration:none;transition:background .15s,color .15s,transform .15s}
+#browse-mode .bw-ibtn:hover{background:#ececef}
+#browse-mode .bw-ibtn:active{background:var(--ink);color:#fff;transform:scale(.97)}
 
 .bw-footer{margin-top:104px;padding:24px 0 56px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
 
@@ -284,6 +330,8 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   .bw-section:first-child{padding-top:48px}
   .bw-grid{gap:48px 32px}
   .bw-about p{font-size:17px}
+  #bw-about.bw-section{padding-top:80px}
+  #bw-contact.bw-section{min-height:420px;padding-top:112px}
   .bw-footer{margin-top:72px}
 }
 
@@ -447,7 +495,10 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   <div id="crt-overlay"></div>
 
   <div id="hud-bar">
-    <div id="hud-avatar-frame"></div>
+    <div class="hud-avatar-col">
+      <div id="hud-avatar-frame"></div>
+      <span class="hud-stat" id="hud-level">LVL 1</span>
+    </div>
     <div style="display:flex;flex-direction:column;gap:6px">
       <span class="hud-player-label">PLAYER 1</span>
       <div style="display:flex;align-items:center;gap:10px">
@@ -456,18 +507,16 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span class="hud-stat" style="width:32px">XP</span>
-        <div class="hud-bar-track" style="height:16px;background:rgba(255,40,137,0.15);border-radius:0;overflow:hidden"><div id="xp-fill" style="width:0%;height:100%;background:#FF2889;border-radius:0;transition:width 0.3s"></div></div>
-        <span class="hud-stat" id="xp-total-label"></span>
+        <div class="hud-bar-track" id="xp-track" style="height:16px;background:rgba(255,40,137,0.15);border-radius:0;overflow:hidden"><div id="xp-fill" style="width:0%;height:100%;background:#FF2889;border-radius:0;transition:width 0.6s cubic-bezier(.25,.8,.3,1)"></div><span class="hud-stat" id="xp-total-label"></span></div>
       </div>
     </div>
   </div>
 
   <div id="pip-tabs">
-    <span class="pip-tab" data-zone="about" onclick="teleportToTab('about')">ABOUT</span>
-    <span class="pip-tab-sep">—</span>
-    <span class="pip-tab active" data-zone="work" onclick="teleportToTab('work')">WORK</span>
-    <span class="pip-tab-sep">—</span>
-    <span class="pip-tab" data-zone="contact" onclick="teleportToTab('contact')">CONTACT</span>
+    <span class="pip-tab" data-zone="about" role="button" aria-label="About" title="About" onclick="teleportToTab('about')"><span class="pip-tab-lbl">About</span><span class="pip-tab-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg></span></span>
+    <span class="pip-tab" data-zone="design" role="button" aria-label="Interfaces &amp; games" title="Interfaces &amp; games" onclick="teleportToTab('design')"><span class="pip-tab-lbl">Interfaces &amp; games</span><span class="pip-tab-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="6"></rect><path d="M6 12h4M8 10v4"></path></svg></span></span>
+    <span class="pip-tab" data-zone="illustration" role="button" aria-label="Illustration &amp; designs" title="Illustration &amp; designs" onclick="teleportToTab('illustration')"><span class="pip-tab-lbl">Illustration &amp; designs</span><span class="pip-tab-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><circle cx="11" cy="11" r="2"></circle></svg></span></span>
+    <span class="pip-tab" data-zone="contact" role="button" aria-label="Contact" title="Contact" onclick="teleportToTab('contact')"><span class="pip-tab-lbl">Contact</span><span class="pip-tab-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg></span></span>
   </div>
 
   <div id="location-indicator"></div>
@@ -518,6 +567,8 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   <!-- Invisible touch zones for mobile movement -->
   <div id="touch-zone-left"><span class="touch-arrow">◄</span></div>
   <div id="touch-zone-right"><span class="touch-arrow">►</span></div>
+  <div id="level-up" role="status" aria-live="polite">LEVEL UP</div>
+  <div id="move-hint" aria-hidden="true"><div class="mh-pulse mh-l"></div><div class="mh-pulse mh-r"></div><div class="mh-hand mh-l"></div><div class="mh-hand mh-r"></div></div>
 
   <!-- Lives inside #game-mode (same stacking context as the HUD, dialog-box
        and project-popup) so its z-index actually compares against theirs —
@@ -605,18 +656,23 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 
     <section class="bw-section" id="bw-about" aria-label="About">
       <div class="bw-about">
-        <h3 class="bw-about-title">Hi, my name is Ásbjörn!</h3>
-        <p>I'm a digital product designer, illustrator, animator and a dabbler in all things digital.</p>
-        <p>I love a challenge; get me a cup of coffee, some new software, and I'll deliver!</p>
+        <!-- Swap the placeholder for <img src="img/portrait.webp" alt="Ásbjörn"> once there's a photo. -->
+        <div class="bw-portrait"><div class="bw-portrait-ph">[PORTRAIT PHOTO]</div></div>
+        <div class="bw-about-text">
+          <h2 class="bw-about-title">I'm Ásbjörn</h2>
+          <p>I'm a Reykjavík-based digital product designer, illustrator and a dabbler in all things digital.</p>
+          <p>I work well in teams and independently. I don't take myself too seriously and have been known to defuse tense atmospheres in a meeting room or two.</p>
+          <p>I love a challenge; get me a cup of coffee, some new software or problems, and I'll deliver!</p>
+        </div>
       </div>
     </section>
 
     <section class="bw-section" id="bw-contact" aria-label="Contact">
-      <ul class="bw-contact">
-        <li><span class="bw-contact-k">Email</span><a href="mailto:asbjornerlingsson@gmail.com">asbjornerlingsson@gmail.com</a></li>
-        <li><span class="bw-contact-k">Phone</span><a href="tel:+3546616443">661 6443</a></li>
-        <li><span class="bw-contact-k">Based in</span><span>Reykjavík, Iceland</span></li>
-      </ul>
+      <h2 class="bw-contact-title">Get in touch</h2>
+      <div class="bw-contact-btns">
+        <a class="bw-ibtn" href="mailto:asbjornerlingsson@gmail.com" aria-label="Email asbjornerlingsson@gmail.com" title="asbjornerlingsson@gmail.com"><svg aria-hidden="true" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg></a>
+        <a class="bw-ibtn" href="tel:+3546616443" aria-label="Call 661 6443" title="661 6443"><svg aria-hidden="true" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"></path></svg></a>
+      </div>
     </section>
 
     <footer class="bw-footer">&copy; Ásbjörn Erlingsson</footer>
@@ -687,7 +743,7 @@ playerIdleImg.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAALQCAYAAAB
 const ZONES=[
   {x:1300,label:'ABOUT',type:'dialog',tab:'about',
     header:'ABOUT — Ásbjörn Erlingsson',
-    content:`I'm a digital product designer, illustrator, animator and a dabbler in all things digital.<br><br>I love a challenge; get me a cup of coffee, some new software, and I'll deliver!<br><br><span>✉ <a href="mailto:asbjornerlingsson@gmail.com" style="color:inherit">asbjornerlingsson@gmail.com</a></span><br><span>☎ 6616443</span>`,
+    content:`I'm a Reykjavík-based digital product designer, illustrator and a dabbler in all things digital.<br><br>I work well in teams and independently. I don't take myself too seriously and have been known to defuse tense atmospheres in a meeting room or two.<br><br>I love a challenge; get me a cup of coffee, some new software or problems, and I'll deliver!<br><br><span>✉ <a href="mailto:asbjornerlingsson@gmail.com" style="color:inherit">asbjornerlingsson@gmail.com</a></span><br><span>☎ 6616443</span>`,
     xp:50},
   {x:1850,label:'VEITA',type:'project',tab:'work',cat:'design',
     title:'Veita',
@@ -696,33 +752,33 @@ const ZONES=[
     tags:['UX Research','UI Design','Figma','Workflows'],
     images:['img/veita1.webp','img/veita2.webp','img/veita3.webp','img/veita4.webp'],
     xp:100},
-  {x:2400,label:'MENIGA',type:'project',tab:'work',cat:'illustration',
-    title:'Meniga Brand Revamp',
-    what:'A new illustration library for Icelandic fintech company Meniga after their rebrand.',
-    how:'The first illustrations made for their new design system, in a visual style I developed to match its language.',
-    tags:['Illustration','Branding','Figma','Design System'],
-    images:['img/meniga8.webp','img/meniga9.webp','img/meniga10.webp','img/meniga11.webp','img/meniga12.webp','img/meniga13.webp','img/meniga14.webp','img/meniga15.webp'],
-    xp:100},
-  {x:2950,label:'DIGITAL PRODUCTS',type:'project',tab:'work',cat:'design',
+  {x:2400,label:'DIGITAL PRODUCTS',type:'project',tab:'work',cat:'design',
     title:'Digital Products',
     what:"Building permit tools, in-house asset management and much more for the City of Reykjavík.",
     how:'Proof-of-concept prototypes, cross-disciplinary teams, endless back-and-forth with stakeholders and an obscene amount of coffee, all held together by a design system that grows with the products.',
     tags:['Product Design','Design Systems','Prototyping','Figma'],
     images:['img/prod1.webp','img/prod2.webp','img/prod3.webp','img/prod4.webp','vid/prod5.mp4'],
     xp:100},
-  {x:3500,label:'ILLUSTRATIONS',type:'project',tab:'work',cat:'illustration',
-    title:'Illustrations',
-    what:"Children's books, youth drug prevention campaigns, commissions and personal work.",
-    how:'Adobe Photoshop, Adobe Illustrator, Procreate.',
-    tags:['Photoshop','Illustrator','Procreate','Illustration'],
-    images:['img/illustrations1.webp','img/illustrations2.webp','img/illustrations4.webp','img/illustrations5.webp','img/illustrations6.webp','img/illustrations7.webp','img/illustrations9.webp','img/illustrations11.webp'],
-    xp:100},
-  {x:4050,label:'GAMES',type:'project',tab:'work',cat:'design',
+  {x:2950,label:'GAMES',type:'project',tab:'work',cat:'design',
     title:'Games & Experiments',
     what:"A 2D platformer where you stomp on sexists instead of Goombas. A phone app that keeps your phone restless and miserable in every position. A first-person game you play as either an arthritic old person or a fit young one.",
     how:'Unity, Pure Data, Blender, Photoshop and pure stubbornness.',
     tags:['Unity','Game Design','Blender','Pure Data'],
     images:['img/other3.webp','https://vimeo.com/330799951?share=copy&fl=sv&fe=ci','https://vimeo.com/1174009421?share=copy&fl=sv&fe=ci','https://vimeo.com/502108393?share=copy&fl=sv&fe=ci','https://www.youtube.com/watch?v=pbdCRVmz6Z4'],
+    xp:100},
+  {x:3500,label:'MENIGA',type:'project',tab:'work',cat:'illustration',
+    title:'Meniga Brand Revamp',
+    what:'A new illustration library for Icelandic fintech company Meniga after their rebrand.',
+    how:'The first illustrations made for their new design system, in a visual style I developed to match its language.',
+    tags:['Illustration','Branding','Figma','Design System'],
+    images:['img/meniga8.webp','img/meniga9.webp','img/meniga10.webp','img/meniga11.webp','img/meniga12.webp','img/meniga13.webp','img/meniga14.webp','img/meniga15.webp'],
+    xp:100},
+  {x:4050,label:'ILLUSTRATIONS',type:'project',tab:'work',cat:'illustration',
+    title:'Illustrations',
+    what:"Children's books, youth drug prevention campaigns, commissions and personal work.",
+    how:'Adobe Photoshop, Adobe Illustrator, Procreate.',
+    tags:['Photoshop','Illustrator','Procreate','Illustration'],
+    images:['img/illustrations1.webp','img/illustrations2.webp','img/illustrations4.webp','img/illustrations5.webp','img/illustrations6.webp','img/illustrations7.webp','img/illustrations9.webp','img/illustrations11.webp'],
     xp:100},
   {x:4600,label:'ODD JOBS',type:'project',tab:'work',cat:'illustration',
     title:'Odd Jobs',
@@ -750,9 +806,9 @@ const ZONES=[
 // Projects that only appear in the static version (no sign in the game).
 const BROWSE_ONLY_PROJECTS=[
   {type:'project',cat:'design',
-   title:'This Portfolio',
-   what:'The game you might have just played: a side-scrolling platformer built in a single HTML file with Canvas and vanilla JavaScript.',
-   how:'',
+   title:'My portfolio',
+   what:'A retro-style 2D side scroller displaying my work and information.',
+   how:'As much as simplifying complicated processes and interfaces is vital to my work, I also love over-complicating things if they make them more fun/interesting. So why not make my portfolio a video game? Tools: Figma, Illustrator, Claude.',
    tags:['Game Design','UI Design','JavaScript','Figma'],
    images:['img/portfolio1.webp']}
 ];
@@ -1063,23 +1119,38 @@ function showPlayerLine(text,duration,side){
   playerLineTimer=duration;
   playerLineSide=side||'right';
 }
-// What the player says, one line after another, the first time they start
-// walking. Timed to finish around when they reach the first sign. Each
-// entry is [text, seconds on screen].
+// How close the player must be to a sign to read it (press E, or tap it
+// without being teleported). Also drives the sign's "near" highlight.
+const SIGN_REACH=110;
+// What the player says at the start. Each line belongs to a stretch of
+// ground and shows while the player is on it, so the lines follow where
+// they walk. The first two come before the ABOUT sign, with a pause
+// between them; the third comes on the way from ABOUT to the next sign.
+// [text, from x, to x]
 const INTRO_LINES=[
-  ["Hi, I'm Ásbjörn",1.5],
-  ["I'm a Digital product designer and illustrator",2.3],
-  ["Let's look at some of my stuff",1.7]
+  ["Hi, I'm Ásbjörn",PLAYER_START_X+20,520],
+  ["I'm a Digital product designer and illustrator",720,1170],
+  ["Let's look at some of my stuff",ZONES[0].x+SIGN_REACH+20,ZONES[1].x-SIGN_REACH-20]
 ];
-let introStep=-1; // -1: not started, INTRO_LINES.length: finished
-function advanceIntro(){
-  if(introStep<0||introStep>=INTRO_LINES.length)return;
-  if(playerLineTimer>0)return;
-  const line=INTRO_LINES[introStep++];
-  showPlayerLine(line[0],line[1],'right');
+let introDone=false,introLine=null,playerHasWalked=false;
+// Called every frame. The intro ends for good once the player reaches the
+// second sign (or teleports somewhere).
+function updateIntro(){
+  // Silent until the visitor has walked the character themselves.
+  if(player.walking)playerHasWalked=true;
+  if(introDone||!playerHasWalked)return;
+  if(player.x>=ZONES[1].x-SIGN_REACH){endIntro();return}
+  const line=INTRO_LINES.find(l=>player.x>=l[1]&&player.x<l[2]);
+  if(line){
+    // Keep it up while they're on this stretch; the usual countdown fades
+    // it a moment after they step off.
+    showPlayerLine(line[0],0.15,'right');introLine=line;
+  }
 }
-// Stops the intro early (e.g. the player teleported to a sign).
-function endIntro(){introStep=INTRO_LINES.length}
+function endIntro(){
+  introDone=true;
+  if(introLine&&playerLineText===introLine[0]){playerLineTimer=0;playerLineText=''}
+}
 
 function init(){
   canvas=document.getElementById('game-canvas');
@@ -1184,10 +1255,12 @@ function setupTouch(){
       // it fired when people tapped to read a sign.
       if(x<screenW/2){
         // Left side — walk left
+        hideMoveHint();
         moveTouches[touch.identifier]='left';
         touchLeft=true;arrowL.classList.add('visible');
       }else{
         // Right side — walk right
+        hideMoveHint();
         moveTouches[touch.identifier]='right';
         touchRight=true;arrowR.classList.add('visible');
       }
@@ -1284,7 +1357,26 @@ function onMouseDown(e){
     return;
   }
 }
-function startGame(){if(gameStarted)return;gameStarted=true;document.getElementById('intro-overlay').classList.add('hidden')}
+function startGame(){if(gameStarted)return;gameStarted=true;document.getElementById('intro-overlay').classList.add('hidden');showMoveHint()}
+
+// The how-to-move hint (touch screens only, see #move-hint). The pixel
+// hand is an 11x14 sprite: k = outline, w = fill.
+const HAND_SPRITE=['...kk......','..kwwk.....','..kwwk.....','..kwwk.....','..kwwkkkk..','..kwwkwwkk.','kkkkwwwwwwk','kwwkwwwwwwk','kwwwwwwwwwk','.kwwwwwwwwk','.kwwwwwwwk.','..kwwwwwwk.','..kwwwwwk..','..kkkkkk...'];
+const HAND_SVG='<svg width="44" height="56" viewBox="0 0 11 14" shape-rendering="crispEdges" aria-hidden="true">'+
+  HAND_SPRITE.map((row,y)=>row.split('').map((c,x)=>c==='.'?'':'<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(c==='k'?'#050E08':'#fbfbfb')+'"></rect>').join('')).join('')+'</svg>';
+let moveHintDone=false;
+function showMoveHint(){
+  const touch=window.matchMedia('(pointer:coarse)').matches||window.matchMedia('(max-width:768px)').matches;
+  if(moveHintDone||!touch)return;
+  const el=document.getElementById('move-hint');
+  el.querySelectorAll('.mh-hand').forEach(h=>{if(!h.firstChild)h.innerHTML=HAND_SVG});
+  el.classList.add('visible');
+}
+function hideMoveHint(){
+  if(moveHintDone)return;
+  moveHintDone=true;
+  document.getElementById('move-hint').classList.remove('visible');
+}
 
 function interact(){
   // Check couch interaction first
@@ -1300,9 +1392,6 @@ function interact(){
   grantZoneXP(z);
   if(z.type==='dialog')showDialog(z);else showProject(z);
 }
-// How close the player must be to a sign to read it (press E, or tap it
-// without being teleported). Also drives the sign's "near" highlight.
-const SIGN_REACH=110;
 function getNearestZone(){for(const z of ZONES)if(Math.abs(player.x-z.x)<SIGN_REACH)return z;return null}
 
 // Spawns a floating '+XP' popup (Mario-coin-style) at a world position.
@@ -1321,6 +1410,41 @@ function spawnXPPopup(worldX,y,amount){
   setTimeout(function(){el.remove()},1100);
 }
 
+// Reading every sign fills the XP bar: LEVEL UP flashes across the screen
+// and the player goes to level 2.
+let playerLevel=1,pendingLevelUp=false;
+// Shows the level-up once no dialog or project popup covers the screen.
+function flushXPFeedback(){
+  if(dialogOpen||popupOpen)return;
+  if(pendingLevelUp){pendingLevelUp=false;setTimeout(levelUp,500)}
+}
+// A brief label on the bar (not a persistent total) that travels with the
+// end of the pink fill from `from` to `to` (fractions of the bar): just
+// right of it, or inside it in black when there's no room left.
+function showXPLabel(amount,from,to){
+  const totalLabel=document.getElementById('xp-total-label');
+  totalLabel.textContent='+'+amount+'XP';
+  const trackW=document.getElementById('xp-track').clientWidth,labelW=totalLabel.offsetWidth,pad=4;
+  const inside=trackW*to+pad+labelW>trackW;
+  const at=f=>Math.max(pad,inside?trackW*f-pad-labelW:trackW*f+pad)+'px';
+  totalLabel.classList.toggle('inside',inside);
+  totalLabel.classList.add('no-move');
+  totalLabel.style.left=at(from);
+  void totalLabel.offsetWidth;
+  totalLabel.classList.remove('no-move');
+  totalLabel.style.left=at(to);
+  totalLabel.classList.add('show');
+  clearTimeout(totalLabel._hideTimeout);
+  totalLabel._hideTimeout=setTimeout(function(){totalLabel.classList.remove('show')},2000);
+}
+function levelUp(){
+  playerLevel=2;
+  const lvl=document.getElementById('hud-level');
+  lvl.textContent='LVL '+playerLevel;
+  lvl.classList.remove('bump');void lvl.offsetWidth;lvl.classList.add('bump');
+  const banner=document.getElementById('level-up');
+  banner.classList.remove('go');void banner.offsetWidth;banner.classList.add('go');
+}
 // Grants XP for a zone the first time it's visited, whether triggered by
 // walking up and pressing E (interact()) or clicking a sign from anywhere
 // (openZone()) — shared so both stay in sync.
@@ -1328,13 +1452,14 @@ function grantZoneXP(z){
   if(visitedZones.has(z.label))return;
   visitedZones.add(z.label);
   totalXP+=z.xp;
-  document.getElementById('xp-fill').style.width=Math.min(100,totalXP/MAX_XP*100)+'%';
-  // Show the amount just gained as a brief toast, not a persistent total.
-  const totalLabel=document.getElementById('xp-total-label');
-  totalLabel.textContent='+'+z.xp+'XP';
-  totalLabel.classList.add('show');
-  clearTimeout(totalLabel._hideTimeout);
-  totalLabel._hideTimeout=setTimeout(function(){totalLabel.classList.remove('show')},2000);
+  const before=Math.min(1,(totalXP-z.xp)/MAX_XP),frac=Math.min(1,totalXP/MAX_XP);
+  document.getElementById('xp-fill').style.width=(frac*100)+'%';
+  // The "+XP" number rides along with the fill as it grows.
+  showXPLabel(z.xp,before,frac);
+  // The level-up waits until the sign's dialog/popup is closed, since it
+  // can cover the screen (on phones it always does).
+  if(totalXP>=MAX_XP&&playerLevel===1)pendingLevelUp=true;
+  setTimeout(flushXPFeedback,0);
   const sb=getSignBounds(z);
   spawnXPPopup(z.x,sb.dy,z.xp);
 }
@@ -1362,7 +1487,7 @@ function updateSwitchStacking(){
   }
 }
 function showDialog(z){activeModalZone=z;const b=document.getElementById('dialog-box');b.querySelector('.dialog-header').textContent=z.header;b.querySelector('.dialog-content').innerHTML=z.content;b.classList.add('visible');dialogOpen=true;positionModal(b,z);updateSwitchStacking()}
-function hideDialog(){document.getElementById('dialog-box').classList.remove('visible');dialogOpen=false;activeModalZone=null;updateSwitchStacking()}
+function hideDialog(){document.getElementById('dialog-box').classList.remove('visible');dialogOpen=false;activeModalZone=null;updateSwitchStacking();flushXPFeedback()}
 function showProject(z){activeModalZone=z;activeProjectImages=z.images||[];const p=document.getElementById('project-popup');
   // Collapsed state content
   p.querySelector('#popup-collapsed .popup-title').textContent=z.title;
@@ -1726,10 +1851,13 @@ function collapseModal(){
   if(activeModalZone)positionModal(p,activeModalZone);
 }
 
-function closePopup(){const p=document.getElementById('project-popup');document.getElementById('popup-image-stack').innerHTML='';p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking()}
+function closePopup(){const p=document.getElementById('project-popup');document.getElementById('popup-image-stack').innerHTML='';p.classList.remove('visible','expanded');p.querySelector('#popup-collapsed').style.display='';p.querySelector('#popup-expanded').style.display='none';document.getElementById('popup-backdrop').classList.remove('visible');popupOpen=false;activeModalZone=null;updateSwitchStacking();flushXPFeedback()}
 
+// Which menu section a zone belongs to: projects by category
+// (design / illustration), the About and Contact signs by their own tab.
+function zoneSection(z){return z.type==='project'?z.cat:z.tab}
 function updateTabs(zone){
-  document.querySelectorAll('.pip-tab').forEach(t=>t.classList.toggle('active',zone&&t.dataset.zone===zone.tab));
+  document.querySelectorAll('.pip-tab').forEach(t=>t.classList.toggle('active',!!zone&&t.dataset.zone===zoneSection(zone)));
 }
 
 // Whichever zone the player is currently closest to, with no proximity
@@ -1766,9 +1894,9 @@ function teleportToZone(zone){
   endIntro();
   showPlayerLine('whoa',1.2,player.facing<0?'left':'right');
 }
-// Teleports the player to the first sign tagged with this tab.
+// Teleports the player to the first sign in this menu section.
 function teleportToTab(tab){
-  const zone=ZONES.find(z=>z.tab===tab);
+  const zone=ZONES.find(z=>zoneSection(z)===tab);
   if(!zone)return;
   teleportToZone(zone);
 }
@@ -1866,9 +1994,7 @@ function update(){
 
   player.walking=moving;
   player.x+=player.vx;
-  // The first steps to the right start the intro lines.
-  if(player.vx>0&&introStep<0)introStep=0;
-  advanceIntro();
+  updateIntro();
   // Movement clamp has extra room past the logical edge (WORLD_EDGE_MARGIN)
   // so the player can keep walking and visually clip off the screen instead
   // of just stopping dead at the content boundary.
@@ -1972,8 +2098,8 @@ function drawSpeechBubble(bctx,text,anchorX,anchorY,side){
   const lean=side==='right'?'left':'right';
   // tailAttachX: where the tail meets the main body's bottom edge.
   // stepDx: which way its steps run from there (mirrors the Figma asset).
-  const tailAttachX=lean==='left'?27:bw-27;
-  const stepDx=lean==='left'?-6:6;
+  let tailAttachX=lean==='left'?27:bw-27;
+  let stepDx=lean==='left'?-6:6;
   let originX=side==='right'?anchorX+gap:anchorX-gap-bw;
   const wantX=originX;
   originX=Math.max(edgeMargin,Math.min(bctx.canvas.width-edgeMargin-bw,originX));
@@ -1981,6 +2107,15 @@ function drawSpeechBubble(bctx,text,anchorX,anchorY,side){
   // lift it above the "PRESS E" / "PLAYER 1" labels instead of covering them.
   const lift=originX!==wantX&&originX<anchorX+gap&&originX+bw>anchorX-gap?64:0;
   const originY=(anchorY-10-lift)-(bh+17);
+  if(lift){
+    // Lifted above the head: point the tail's tip (three 6px steps from
+    // where it leaves the bubble) straight down at the head, leaning
+    // whichever way leaves room inside the bubble's bottom edge.
+    const headX=anchorX-originX;
+    stepDx=-6;tailAttachX=headX+18;
+    if(tailAttachX>bw-n-4){stepDx=6;tailAttachX=headX-18}
+    tailAttachX=Math.max(n+4,Math.min(bw-n-4,tailAttachX));
+  }
 
   bctx.translate(originX,originY);
   bctx.fillStyle='#fbfbfb';
