@@ -50,4 +50,4 @@
 - Game: touch-to-move hint (edge pulse + tapping pixel hand) on touch screens until the first tap; bottom menu in the Arcade select style with the static menu's four sections (icons on phones); intro lines 1–2 before ABOUT with a pause between, line 3 between ABOUT and VEITA (Nov 10).
 - Game: more space between bottom-menu buttons; "+XP" shows on the XP bar itself; "LVL 1" under the avatar; reading every sign shows LEVEL UP and goes to LVL 2 (Nov 10).
 - Game: the +XP number appears as soon as a sign is opened and rides along with the filling bar; LEVEL UP still waits for the popup to close; LVL label moved down a little (Nov 10).
-- Game: signs reordered to match the bottom menu and static version: Veita, Digital Products, Games, Meniga, Illustrations, Odd Jobs, Wedding, About, Contact. Intro lines now play before and after the first sign (Veita) (Nov 10).
+- Game: signs in the static version's order (About, Veita, Digital Products, Games, Meniga, Illustrations, Odd Jobs, Wedding, Contact); bottom menu in the same order: About, Interfaces & games, Illustration & designs, Contact (Nov 10).
