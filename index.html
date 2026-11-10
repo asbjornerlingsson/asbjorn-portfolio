@@ -200,16 +200,16 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .touch-arrow.visible{color:rgba(255,40,137,0.2)}
 
 /* Touch screens: how-to-move hint ("Edge pulse"). The left and right edges
-   flash pink in turn while a pixel hand taps each one. Loops from the start
-   of the game until the first tap to walk, then fades out. */
+   flash pink in turn while a pixel hand taps each one. Plays once at the
+   start of the game (left, then right), or stops at the first tap to walk. */
 #move-hint{position:fixed;inset:0;z-index:88;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
 #move-hint.visible{opacity:1;visibility:visible;transition:opacity .4s}
-.mh-pulse{position:absolute;top:0;bottom:0;width:72px;background:#FF2889;opacity:0;animation:mh-pulse 2.4s ease-in-out infinite}
+.mh-pulse{position:absolute;top:0;bottom:0;width:72px;background:#FF2889;opacity:0;animation:mh-pulse 2.4s ease-in-out both}
 .mh-pulse.mh-l{left:0}
 .mh-pulse.mh-r{right:0;animation-delay:1.2s}
-.mh-hand{position:absolute;top:56%;opacity:0;animation:mh-tap 2.4s ease-in-out infinite}
-.mh-hand.mh-l{left:14px}
-.mh-hand.mh-r{right:14px;animation-delay:1.2s}
+.mh-hand{position:absolute;top:56%;opacity:0;animation:mh-tap 2.4s ease-in-out both}
+.mh-hand.mh-l{left:22px}
+.mh-hand.mh-r{right:22px;animation-delay:1.2s}
 .mh-hand svg{display:block}
 @keyframes mh-pulse{0%,100%{opacity:0}20%{opacity:.32}45%{opacity:0}}
 @keyframes mh-tap{0%,100%{opacity:0;transform:translateY(10px) scale(1)}8%{opacity:1;transform:translateY(0) scale(1)}18%{transform:translateY(0) scale(.82)}28%{transform:translateY(0) scale(1)}42%{opacity:1}50%{opacity:0}}
@@ -1373,10 +1373,10 @@ function onMouseDown(e){
 function startGame(){if(gameStarted)return;gameStarted=true;document.getElementById('intro-overlay').classList.add('hidden');showMoveHint()}
 
 // The how-to-move hint (touch screens only, see #move-hint). The pixel
-// hand is an 11x14 sprite: k = outline, w = fill.
+// hand is an 11x14 sprite: k = outline, w = fill (the theme's pink).
 const HAND_SPRITE=['...kk......','..kwwk.....','..kwwk.....','..kwwk.....','..kwwkkkk..','..kwwkwwkk.','kkkkwwwwwwk','kwwkwwwwwwk','kwwwwwwwwwk','.kwwwwwwwwk','.kwwwwwwwk.','..kwwwwwwk.','..kwwwwwk..','..kkkkkk...'];
-const HAND_SVG='<svg width="44" height="56" viewBox="0 0 11 14" shape-rendering="crispEdges" aria-hidden="true">'+
-  HAND_SPRITE.map((row,y)=>row.split('').map((c,x)=>c==='.'?'':'<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(c==='k'?'#050E08':'#fbfbfb')+'"></rect>').join('')).join('')+'</svg>';
+const HAND_SVG='<svg width="28" height="36" viewBox="0 0 11 14" shape-rendering="crispEdges" aria-hidden="true">'+
+  HAND_SPRITE.map((row,y)=>row.split('').map((c,x)=>c==='.'?'':'<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(c==='k'?'#050E08':'#FF2889')+'"></rect>').join('')).join('')+'</svg>';
 let moveHintDone=false;
 function showMoveHint(){
   const touch=window.matchMedia('(pointer:coarse)').matches||window.matchMedia('(max-width:768px)').matches;
@@ -1384,6 +1384,8 @@ function showMoveHint(){
   const el=document.getElementById('move-hint');
   el.querySelectorAll('.mh-hand').forEach(h=>{if(!h.firstChild)h.innerHTML=HAND_SVG});
   el.classList.add('visible');
+  // One pass: the right side starts 1.2s in and runs 2.4s.
+  setTimeout(hideMoveHint,3600);
 }
 function hideMoveHint(){
   if(moveHintDone)return;
