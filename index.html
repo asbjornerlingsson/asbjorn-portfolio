@@ -99,7 +99,9 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   #pip-tabs{gap:8px;flex-wrap:nowrap}
   .pip-tab{position:relative;gap:0;padding:0 10px;font-size:13px;letter-spacing:.5px;transition:background .3s,color .3s,border-color .3s,padding .45s cubic-bezier(.4,0,.2,1) .15s}
   .pip-tab-lbl{display:inline-flex;justify-content:center;max-width:20px;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .15s ease}
-  .pip-tab-ico{display:inline-flex;justify-content:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;opacity:1;transition:opacity .45s ease .15s}
+  /* The icon keeps the theme's pink while it fades in or out, instead of
+     taking the selected button's dark text colour. */
+  .pip-tab-ico{color:var(--pip);display:inline-flex;justify-content:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;opacity:1;transition:opacity .45s ease .15s}
   .pip-tab.active{padding:0 12px}
   /* --w is the name's real width (measureTabLabels). */
   .pip-tab.active .pip-tab-lbl{max-width:var(--w,240px);opacity:1;transition:max-width .45s cubic-bezier(.4,0,.2,1) .15s,opacity .25s ease .4s}
@@ -147,6 +149,8 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 }
 #dialog-box.visible{opacity:1;pointer-events:all}
 .dialog-header{font-family:'Share Tech Mono',monospace;font-size:calc(22px + 4px * var(--rs));font-weight:bold;color:#050E08;margin-bottom:calc(14px + 2px * var(--rs));letter-spacing:0;border-bottom:none;padding-bottom:0;text-shadow:none}
+/* Mail/phone icons in the About me and Contact me dialogs. */
+.dlg-ico{width:1.15em;height:1.15em;vertical-align:-0.22em;margin-right:.45em}
 .dialog-content{font-family:'Share Tech Mono',monospace;font-size:calc(16px + 3px * var(--rs));font-weight:normal;line-height:1.6;color:#050E08}
 .dialog-content span{color:#444!important}
 .dialog-hint{display:none}
@@ -755,7 +759,7 @@ playerIdleImg.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAALQCAYAAAB
 const ZONES=[
   {x:1300,label:'ABOUT ME',type:'dialog',tab:'about',
     header:'ABOUT ME',
-    content:`I'm a Reykjavík-based digital product designer, illustrator and a dabbler in all things digital.<br><br>I'm passionate about many fields of design, from UI/UX to illustration, animation and game-making. I am well experienced in working as part of a team as well as independently.<br><br>I love a challenge; get me a cup of coffee, some new software or problems, and I'll deliver!<br><br><span>✉ <a href="mailto:asbjornerlingsson@gmail.com" style="color:inherit">asbjornerlingsson@gmail.com</a></span><br><span>☎ 6616443</span>`,
+    content:`I'm a Reykjavík-based digital product designer, illustrator and a dabbler in all things digital.<br><br>I'm passionate about many fields of design, from UI/UX to illustration, animation and game-making. I am well experienced in working as part of a team as well as independently.<br><br>I love a challenge; get me a cup of coffee, some new software or problems, and I'll deliver!<br><br><span><svg class="dlg-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.16,20.25q-1.03,0-1.74-0.72T1.7,17.79V6.21q0-1.03 0.72-1.74T4.16,3.75H19.84q1.03,0 1.74,0.72T22.3,6.21V17.79q0,1.03-0.72,1.74t-1.74,0.72H4.16Zm8.17-7.38q0.16-0.05 0.3-0.14l7.05-4.51q0.17-0.1 0.29-0.35t0.09-0.49q-0.02-0.48-0.46-0.71T18.72,6.71L12,11L5.28,6.71Q4.83,6.44 4.4,6.65T3.93,7.38Q3.9,7.64 4.02,7.87T4.31,8.22l7.05,4.5q0.15,0.09 0.3,0.14T12,12.92t0.33-0.05Z"/></svg><a href="mailto:asbjornerlingsson@gmail.com" style="color:inherit">asbjornerlingsson@gmail.com</a></span><br><span><svg class="dlg-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.24,21.3q-3.2,0-6.35-1.4T8.11,15.88Q5.5,13.28 4.1,10.12T2.7,3.76q0-0.5 0.27-0.78T3.75,2.7H7.96q0.38,0 0.68,0.25T9.05,3.56L9.72,7.25Q9.78,7.61 9.7,7.9T9.44,8.35l-2.53,2.5q0.53,0.95 1.21,1.81t1.51,1.71q0.8,0.77 1.65,1.44t1.78,1.2l2.64-2.56q0.21-0.22 0.43-0.28t0.48-0.01l3.78,0.82q0.38,0.1 0.64,0.39t0.26,0.65v4.24q0,0.5-0.28,0.77T20.24,21.3Z"/></svg>6616443</span>`,
     xp:50},
   {x:1850,label:'VEITA',type:'project',tab:'work',cat:'design',
     title:'Veita',
@@ -818,7 +822,7 @@ const ZONES=[
     xp:100},
   {x:6250,label:'CONTACT ME',type:'dialog',tab:'contact',
     header:'CONTACT ME',
-    content:`Ásbjörn Erlingsson<br>Digital Product Designer<br><br><span>✉ <a href="mailto:asbjornerlingsson@gmail.com" style="color:inherit">asbjornerlingsson@gmail.com</a></span><br><span>☎ 6616443</span><br><br>Thanks for exploring. Quest complete.`,
+    content:`Ásbjörn Erlingsson<br>Digital Product Designer<br><br><span><svg class="dlg-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.16,20.25q-1.03,0-1.74-0.72T1.7,17.79V6.21q0-1.03 0.72-1.74T4.16,3.75H19.84q1.03,0 1.74,0.72T22.3,6.21V17.79q0,1.03-0.72,1.74t-1.74,0.72H4.16Zm8.17-7.38q0.16-0.05 0.3-0.14l7.05-4.51q0.17-0.1 0.29-0.35t0.09-0.49q-0.02-0.48-0.46-0.71T18.72,6.71L12,11L5.28,6.71Q4.83,6.44 4.4,6.65T3.93,7.38Q3.9,7.64 4.02,7.87T4.31,8.22l7.05,4.5q0.15,0.09 0.3,0.14T12,12.92t0.33-0.05Z"/></svg><a href="mailto:asbjornerlingsson@gmail.com" style="color:inherit">asbjornerlingsson@gmail.com</a></span><br><span><svg class="dlg-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.24,21.3q-3.2,0-6.35-1.4T8.11,15.88Q5.5,13.28 4.1,10.12T2.7,3.76q0-0.5 0.27-0.78T3.75,2.7H7.96q0.38,0 0.68,0.25T9.05,3.56L9.72,7.25Q9.78,7.61 9.7,7.9T9.44,8.35l-2.53,2.5q0.53,0.95 1.21,1.81t1.51,1.71q0.8,0.77 1.65,1.44t1.78,1.2l2.64-2.56q0.21-0.22 0.43-0.28t0.48-0.01l3.78,0.82q0.38,0.1 0.64,0.39t0.26,0.65v4.24q0,0.5-0.28,0.77T20.24,21.3Z"/></svg>6616443</span><br><br>Thanks for exploring. Quest complete.`,
     xp:50}
 ];
 
