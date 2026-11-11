@@ -302,9 +302,11 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:64px 40px}
 .bw-card{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:20px;cursor:pointer;min-width:0}
 .bw-card-media{aspect-ratio:4/3;background:var(--surface);border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:28px;box-sizing:border-box;transition:background-color .35s ease}
-.bw-card-media img{width:100%;height:100%;object-fit:contain;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.bw-card-media img,.bw-card-media video{width:100%;height:100%;object-fit:contain;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
 .bw-card:hover .bw-card-media,.bw-card:focus-visible .bw-card-media{background-color:#f9f9fa}
-.bw-card:hover .bw-card-media img,.bw-card:focus-visible .bw-card-media img{transform:scale(1.08)}
+/* Video thumbnails have a white background: blend it into the panel. */
+.bw-card-media video{mix-blend-mode:multiply}
+.bw-card:hover .bw-card-media img,.bw-card:focus-visible .bw-card-media img,.bw-card:hover .bw-card-media video,.bw-card:focus-visible .bw-card-media video{transform:scale(1.08)}
 #browse-mode .bw-card:focus-visible{outline:2px solid var(--ink);outline-offset:6px;border-radius:18px}
 /* Title gets an underline that draws in from the left on hover. */
 .bw-card-title{display:inline;font-size:21px;font-weight:700;letter-spacing:-0.015em;background-image:linear-gradient(var(--ink),var(--ink));background-size:0 2px;background-repeat:no-repeat;background-position:0 100%;padding-bottom:2px;transition:background-size .35s cubic-bezier(.2,.7,.2,1)}
@@ -768,7 +770,9 @@ const ZONES=[
     what:"Building permit tools, in-house asset management and much more for the City of Reykjavík.",
     how:'Proof-of-concept prototypes, cross-disciplinary teams, endless back-and-forth with stakeholders and an obscene amount of coffee, all held together by a design system that grows with the products.',
     tags:['Product Design','Design Systems','Prototyping','Figma'],
-    images:['img/prod1.webp','img/prod2.webp','img/prod3.webp','img/prod4.webp','vid/prod5.mp4'],
+    // The video is the thumbnail (its first frame as the still) and opens first.
+    cover:'vid/prod5.mp4',poster:'img/prod5-poster.webp',
+    images:['vid/prod5.mp4','img/prod1.webp','img/prod2.webp','img/prod3.webp','img/prod4.webp'],
     xp:100},
   {x:2950,label:'GAMES',type:'project',tab:'work',cat:'design',
     title:'Games & Experiments',
@@ -840,7 +844,19 @@ function browseCard(z){
   card.type='button';card.className='bw-card';
   var media=document.createElement('div');media.className='bw-card-media';
   var cover=z.cover||(z.images||[]).filter(function(u){return !isVidUrl(u)})[0];
-  if(cover){
+  if(cover&&isVidUrl(cover)){
+    // A video thumbnail: shows its poster still, plays on repeat while the
+    // card is hovered (or focused), pauses when the pointer leaves.
+    var vid=document.createElement('video');
+    vid.src=cover;if(z.poster)vid.poster=z.poster;
+    vid.muted=true;vid.loop=true;vid.playsInline=true;vid.preload='none';
+    vid.setAttribute('muted','');vid.setAttribute('playsinline','');vid.setAttribute('aria-hidden','true');
+    media.appendChild(vid);
+    var play=function(){var pr=vid.play();if(pr&&pr.catch)pr.catch(function(){})};
+    var stop=function(){vid.pause()};
+    card.addEventListener('mouseenter',play);card.addEventListener('focus',play);
+    card.addEventListener('mouseleave',stop);card.addEventListener('blur',stop);
+  }else if(cover){
     var img=document.createElement('img');
     img.src=cover;img.alt='';img.loading='lazy';img.decoding='async';
     media.appendChild(img);
@@ -1595,7 +1611,7 @@ function lbMedia(url){
       var vimeoId=url.split('vimeo.com/')[1].split('?')[0].split('/')[0];
       return '<iframe src="https://player.vimeo.com/video/'+vimeoId+'?autoplay=1&muted=1" allow="autoplay" allowfullscreen></iframe>';
     }
-    return '<video src="'+url+'" controls autoplay muted playsinline></video>';
+    return '<video src="'+url+'" controls autoplay muted loop playsinline></video>';
   }
   return '<img src="'+url+'" alt="" draggable="false">';
 }
@@ -1753,7 +1769,7 @@ function bmMedia(url,idx,imagesExpr,altText){
     }
     // Browsers only allow autoplay when the video is also muted; playsinline
     // keeps it from forcing fullscreen on mobile the moment it starts.
-    return '<video src="'+url+'" style="width:100%;height:100%;object-fit:contain" controls autoplay muted playsinline></video>';
+    return '<video src="'+url+'" style="width:100%;height:100%;object-fit:contain" controls autoplay muted loop playsinline></video>';
   }
   return '<img src="'+url+'" alt="'+altText+'" style="width:100%;height:100%;object-fit:contain;cursor:pointer" onclick="openLB('+imagesExpr+','+idx+')">';
 }
@@ -1849,7 +1865,8 @@ function imageStackHTML(images,imagesExpr){
         var vimeoId=url.split('vimeo.com/')[1].split('?')[0].split('/')[0];
         return '<iframe src="https://player.vimeo.com/video/'+vimeoId+'" loading="lazy" allowfullscreen></iframe>';
       }
-      return '<video src="'+url+'" controls muted playsinline preload="metadata"></video>';
+      // A local clip (not an embed) plays on repeat here too.
+      return '<video src="'+url+'" controls autoplay muted loop playsinline preload="metadata"></video>';
     }
     return '<img src="'+url+'" alt="Project image '+(i+1)+'" loading="lazy" onclick="openLB('+imagesExpr+','+i+')">';
   }).join('');
