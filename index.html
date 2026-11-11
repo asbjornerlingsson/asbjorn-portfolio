@@ -1160,10 +1160,13 @@ const SIGN_REACH=110;
 // they walk. The first two come before the ABOUT sign, with a pause
 // between them; the third comes on the way from ABOUT to the next sign.
 // [text, from x, to x]
+// Each line clears this far before a sign's reading range, so there's a
+// short breather before "PRESS E" appears.
+const INTRO_SIGN_GAP=140;
 const INTRO_LINES=[
   ["Hi, I'm Ásbjörn",PLAYER_START_X+20,520],
-  ["I'm a Digital product designer and illustrator",720,1170],
-  ["Let's look at some of my stuff",ZONES[0].x+SIGN_REACH+20,ZONES[1].x-SIGN_REACH-20]
+  ["I'm a Digital product designer and illustrator",700,ZONES[0].x-SIGN_REACH-INTRO_SIGN_GAP],
+  ["Let's look at some of my stuff",ZONES[0].x+SIGN_REACH+10,ZONES[1].x-SIGN_REACH-INTRO_SIGN_GAP]
 ];
 let introDone=false,introLine=null,playerHasWalked=false;
 // Called every frame. The intro ends for good once the player reaches the
