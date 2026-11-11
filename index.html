@@ -1029,14 +1029,14 @@ function placeModeSwitch(){
   }
   sw.style.right=right+'px';
 }
-// Going back to game mode: glide (top and right) to the usual spot
-// instead of jumping there.
+// Going back to game mode: glide to the usual spot in two straight
+// moves, first vertically, then sideways, instead of jumping there.
 function glideModeSwitchHome(){
   var sw=document.getElementById('mode-switch');
   if(!sw)return;
-  sw.style.transition='background 0.25s,right 0.45s ease-in-out,top 0.45s ease-in-out';
+  sw.style.transition='background 0.25s,top 0.3s ease-in-out,right 0.4s ease-in-out 0.3s';
   clearTimeout(sw._glide);
-  sw._glide=setTimeout(function(){sw.style.transition='background 0.25s,right 0.45s ease-in-out'},500);
+  sw._glide=setTimeout(function(){sw.style.transition='background 0.25s,right 0.45s ease-in-out'},750);
 }
 (function(){
   var bm=document.getElementById('browse-mode');
