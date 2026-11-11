@@ -977,8 +977,8 @@ function animateMenuFold(menu,stuck){
 // The mode switch starts 40px from the top right and scrolls up with the
 // page until it reaches its spot in the sticky bar (centred on the menu
 // buttons), then stays there; that part is tied to the scroll position
-// alone, so it never jumps when the menu sticks or folds. Once it's
-// stuck at the top it also eases in sideways until its right edge lines
+// alone, so it never jumps when the menu sticks or folds. When the
+// category buttons stick to the top, it also eases in sideways until its right edge lines
 // up with the right edge of the page's content, and back out when the
 // visitor scrolls back up (the `right` transition on #mode-switch).
 var SWITCH_REST_TOP=40,SWITCH_REST_RIGHT=40;
@@ -990,10 +990,10 @@ function placeModeSwitch(){
   var inner=menu.querySelector('.bw-menu-inner'),tab=inner.querySelector('.bw-tab');
   var barTop=parseFloat(getComputedStyle(menu).paddingTop)+parseFloat(getComputedStyle(inner).paddingTop);
   var inBar=Math.round(barTop+tab.offsetHeight/2-sw.offsetHeight/2);
-  var stuck=SWITCH_REST_TOP-bm.scrollTop<=inBar;
   sw.style.top=Math.max(inBar,SWITCH_REST_TOP-bm.scrollTop)+'px';
   var right=SWITCH_REST_RIGHT;
-  if(stuck){
+  // Ease in once the category buttons have stuck to the top.
+  if(menu.classList.contains('is-stuck')){
     // Right edge of the content column (inside .bw's side padding).
     var main=document.querySelector('#browse-mode .bw');
     var contentRight=main.getBoundingClientRect().right-parseFloat(getComputedStyle(main).paddingRight);
