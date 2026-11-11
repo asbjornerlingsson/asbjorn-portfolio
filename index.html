@@ -351,8 +351,10 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   .bw-section:first-child{padding-top:48px}
   .bw-grid{gap:48px 32px}
   .bw-about p{font-size:17px}
-  #bw-about.bw-section{padding-top:240px}
-  .bw-portrait{max-width:300px}
+  /* Phones: centred portrait, 160px above it and between it and the text. */
+  #bw-about.bw-section{padding-top:160px}
+  .bw-about{row-gap:160px}
+  .bw-portrait{max-width:300px;margin:0 auto}
   #bw-contact.bw-section{min-height:420px;padding-top:240px}
   .bw-footer{margin-top:72px}
 }
