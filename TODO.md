@@ -56,3 +56,4 @@
 - Game: how-to-move hint plays twice per side; on phones the selected bottom-menu button opens/closes its name fluidly; eye-strain hint after 30s instead of 15s (Nov 10).
 - Game on phones: the selected menu button resizes first, then swaps icon for name (and back); pink ◄ ► movement arrows removed (Nov 10).
 - Game on desktop: speech bubbles wrap at a narrower width, so the second intro line is two lines high and no longer covers "PLAYER 1"; the image browser in an expanded project popup is centred vertically against the text (Nov 12).
+- Mode switch: always 22px from the top; in game mode and the static version before the menu sticks it is 22px from the right edge too, and once the menu sticks it slides in to line up with the project cards' right edge (Nov 12).
