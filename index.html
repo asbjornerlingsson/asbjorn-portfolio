@@ -964,7 +964,7 @@ function animateMenuFold(menu,stuck){
   });
   void inner.offsetWidth;
   menu.classList.remove('is-measuring');
-  var D=stuck?780:720;
+  var D=stuck?1100:1000; // ms
   // A liquid curve: quick start, soft landing.
   var goo='cubic-bezier(.45,0,.2,1)';
   function run(el,frames){var a=el.animate(frames,{duration:D,fill:'both'});menuFoldAnims.push(a);return a}
