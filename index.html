@@ -372,7 +372,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   flex:1;min-width:0;
 }
 #popup-expanded .popup-expanded-right{
-  flex:0 0 510px;align-self:stretch;
+  flex:0 0 510px;align-self:center;
 }
 .popup-image-placeholder{
   width:100%;height:300px;
@@ -2163,7 +2163,7 @@ function drawSpeechBubble(bctx,text,anchorX,anchorY,side){
   // fits even while the player is near the left edge at the start.
   const above=W<600;
   const sidePad=72;
-  const maxTextW=above?Math.max(120,W-sidePad*2-padX*2):Math.min(420,W-edgeMargin*2-padX*2);
+  const maxTextW=above?Math.max(120,W-sidePad*2-padX*2):Math.min(270,W-edgeMargin*2-padX*2);
   // Wrap onto more lines when the text is wider than that.
   const lines=[];
   text.split(' ').forEach(function(word){
