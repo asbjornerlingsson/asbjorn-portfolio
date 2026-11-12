@@ -284,7 +284,8 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .bw-menu-inner{max-width:1160px;margin:0 auto;padding:12px 40px;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:10px;transition:padding-right .3s}
 /* When stuck, keep the tabs clear of the mode switch, which sits in the
    bar's top-right corner (see placeModeSwitch()). */
-.bw-menu.is-stuck .bw-menu-inner{padding-right:clamp(40px,calc(152px - (100vw - 1176px) / 2),144px)}
+.bw-menu.is-stuck .bw-menu-inner{padding-right:152px}
+@media(max-width:720px){.bw-menu.is-stuck .bw-menu-inner{padding-right:20px}}
 #browse-mode .bw-tab{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border-radius:999px;font-size:15px;font-weight:600;text-decoration:none;border:1.5px solid var(--ink);box-sizing:border-box;background:transparent;color:var(--ink);padding:0 20px;transition:padding .42s cubic-bezier(.4,0,.2,1),background .15s,color .15s,border-color .15s,transform .15s}
 #browse-mode .bw-tab:hover{background:#ececef;color:var(--ink)}
 #browse-mode .bw-tab[aria-current="true"]{background:var(--ink);color:#fff}
@@ -445,7 +446,6 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   border-bottom:10px solid #FF2889;
 }
 #mode-hint-arrow-inner{display:none}
-@media(max-width:480px){#mode-hint{right:16px}#mode-hint-arrow{right:48px}}
 
 #lightbox{position:fixed;inset:0;z-index:800;background:rgba(217,217,217,0.9);display:none;align-items:center;justify-content:center;gap:24px;cursor:pointer}
 #lightbox.visible{display:flex}
@@ -608,7 +608,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 </div>
 
 <!-- MODE TOGGLE (always visible) -->
-<div id="mode-switch" onclick="toggleMode()" style="position:fixed;top:40px;right:40px;z-index:300;width:96px;height:40px;border-radius:54px;cursor:pointer;pointer-events:all;-webkit-tap-highlight-color:transparent;transition:background 0.25s,right 0.45s ease-in-out;background:#FF2889">
+<div id="mode-switch" onclick="toggleMode()" style="position:fixed;top:22px;right:40px;z-index:300;width:96px;height:40px;border-radius:54px;cursor:pointer;pointer-events:all;-webkit-tap-highlight-color:transparent;transition:background 0.25s;background:#FF2889">
   <div id="mode-switch-knob" style="position:absolute;top:4px;width:32px;height:32px;border-radius:93px;background:white;box-shadow:0 4px 8px rgba(0,0,0,0.08);transition:left 0.25s;left:60px"></div>
   <!-- Game ON icon (white outlined retro controller) -->
   <svg id="mode-icon-on" style="position:absolute;top:5px;left:8px;width:30px;height:30px" viewBox="0 0 30 30" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1002,41 +1002,28 @@ function animateMenuFold(menu,stuck){
     clearMenuFold(inner,tabs);placeModeSwitch();
   }).catch(function(){});
 }
-// The mode switch starts 40px from the top right and scrolls up with the
-// page until it reaches its spot in the sticky bar (centred on the menu
-// buttons), then stays there; that part is tied to the scroll position
-// alone, so it never jumps when the menu sticks or folds. When the
-// category buttons stick to the top, it also eases in sideways until its right edge lines
-// up with the right edge of the page's content, and back out when the
-// visitor scrolls back up (the `right` transition on #mode-switch).
-var SWITCH_REST_TOP=40,SWITCH_REST_RIGHT=40;
-function placeModeSwitch(){
-  var sw=document.getElementById('mode-switch'),menu=document.getElementById('bw-menu');
-  var bm=document.getElementById('browse-mode');
-  if(!sw)return;
-  if(currentMode!=='browse'||!menu||!menu.offsetHeight){sw.style.top=SWITCH_REST_TOP+'px';sw.style.right=SWITCH_REST_RIGHT+'px';return}
-  var inner=menu.querySelector('.bw-menu-inner'),tab=inner.querySelector('.bw-tab');
-  var barTop=parseFloat(getComputedStyle(menu).paddingTop)+parseFloat(getComputedStyle(inner).paddingTop);
-  var inBar=Math.round(barTop+tab.offsetHeight/2-sw.offsetHeight/2);
-  sw.style.top=Math.max(inBar,SWITCH_REST_TOP-bm.scrollTop)+'px';
-  var right=SWITCH_REST_RIGHT;
-  // Ease in once the category buttons have stuck to the top.
-  if(menu.classList.contains('is-stuck')){
-    // Right edge of the content column (inside .bw's side padding).
-    var main=document.querySelector('#browse-mode .bw');
-    var contentRight=main.getBoundingClientRect().right-parseFloat(getComputedStyle(main).paddingRight);
-    right=Math.round(window.innerWidth-contentRight);
-  }
-  sw.style.right=right+'px';
+// The mode switch sits in one fixed spot in both modes and at every scroll
+// position: 22px from the top (centred on the sticky menu's buttons) with
+// its right edge lined up with the right edge of the page's content (the
+// 1160px column, 40px side padding; 20px on phones). The eye-strain hint
+// hangs just below it, its arrow pointing at the switch's centre.
+var SWITCH_TOP=22,SWITCH_W=96,SWITCH_H=40;
+function switchRight(){
+  var W=window.innerWidth,pad=W<=720?20:40;
+  return Math.round(Math.max(0,(W-1160)/2)+pad);
 }
-// Going back to game mode: glide to the usual spot in two straight
-// moves, first vertically, then sideways, instead of jumping there.
-function glideModeSwitchHome(){
+function placeModeSwitch(){
   var sw=document.getElementById('mode-switch');
   if(!sw)return;
-  sw.style.transition='background 0.25s,top 0.3s ease-in-out,right 0.4s ease-in-out 0.3s';
-  clearTimeout(sw._glide);
-  sw._glide=setTimeout(function(){sw.style.transition='background 0.25s,right 0.45s ease-in-out'},750);
+  var right=switchRight();
+  sw.style.top=SWITCH_TOP+'px';sw.style.right=right+'px';
+  var hint=document.getElementById('mode-hint'),arrow=document.getElementById('mode-hint-arrow');
+  if(hint&&arrow){
+    var hr=Math.max(16,right);
+    hint.style.right=hr+'px';hint.style.top=(SWITCH_TOP+SWITCH_H+12)+'px';
+    // Arrow is 20px wide, positioned from the hint's right edge.
+    arrow.style.right=Math.round(right+SWITCH_W/2-hr-10)+'px';
+  }
 }
 (function(){
   var bm=document.getElementById('browse-mode');
@@ -1083,7 +1070,6 @@ function toggleMode(){
   }else{
     currentMode='game';
     document.getElementById('browse-mode').classList.remove('active');
-    glideModeSwitchHome();
     document.getElementById('browse-mode').scrollTop=0;
     placeModeSwitch();
     document.getElementById('game-mode').classList.remove('hidden');
@@ -1218,6 +1204,7 @@ function endIntro(){
 }
 
 function init(){
+  placeModeSwitch();
   canvas=document.getElementById('game-canvas');
   playerCanvas=document.getElementById('player-canvas');
   playerCtx=playerCanvas.getContext('2d');
