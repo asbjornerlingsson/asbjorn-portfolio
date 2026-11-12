@@ -261,6 +261,10 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
    ============================== */
 #browse-mode{
   --ink:#121315;--muted:#5f636a;--line:#e6e6e9;--surface:#f4f4f5;
+  /* Layout spacing (phone values in the 720px block below) */
+  --proj-gap-row:64px;--proj-gap-col:40px;
+  --about-top:320px;--about-stack-gap:48px;--about-side-gap:56px;
+  --portrait-w:280px;--portrait-r:28px;--contact-top:360px;
   font-family:'Inter',Helvetica,Arial,sans-serif;color:var(--ink);
   scroll-behavior:smooth;-webkit-user-select:text;user-select:text;
   /* No scroll anchoring: when the sticky menu folds and gets shorter, the
@@ -307,7 +311,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .bw{max-width:1160px;margin:0 auto;padding:0 40px}
 .bw-section{padding-top:104px;scroll-margin-top:80px}
 .bw-section:first-child{padding-top:64px}
-.bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:64px 40px}
+.bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:var(--proj-gap-row) var(--proj-gap-col)}
 .bw-card{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:20px;cursor:pointer;min-width:0}
 .bw-card-media{aspect-ratio:4/3;background:var(--surface);border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:28px;box-sizing:border-box;transition:background-color .35s ease}
 .bw-card-media img,.bw-card-media video{width:100%;height:100%;object-fit:contain;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
@@ -322,11 +326,14 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 @media(prefers-reduced-motion:reduce){.bw-card-media img,.bw-card-title{transition:none}}
 .bw-card-what{font-size:15px;line-height:1.55;color:var(--muted);margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
-.bw-about{display:flex;flex-wrap:wrap;gap:48px 56px;align-items:flex-start}
-#bw-about.bw-section{padding-top:320px}
+.bw-about{display:flex;flex-wrap:wrap;gap:var(--about-stack-gap) var(--about-side-gap);align-items:flex-start}
+#bw-about.bw-section{padding-top:var(--about-top)}
 /* Portrait on a rounded grey panel like the project thumbnails; the
    photo's white background is blended into it so the frame shows. */
-.bw-portrait{flex:1 1 280px;max-width:360px;background:var(--surface);border-radius:28px;overflow:hidden}
+/* margin:auto only takes effect once the portrait wraps onto its own
+   line above the text (the text soaks up the space when side by side),
+   so it's centred whenever it's stacked. */
+.bw-portrait{flex:1 1 var(--portrait-w);max-width:var(--portrait-w);margin:0 auto;background:var(--surface);border-radius:var(--portrait-r);overflow:hidden}
 /* The photo is 2:3; the 4:5 crop keeps the face, trimming a little top and bottom. */
 .bw-portrait img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 35%;mix-blend-mode:multiply}
 .bw-about-text{flex:999 1 480px;min-width:0}
@@ -334,7 +341,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .bw-about p{font-size:19px;line-height:1.7}
 .bw-about p+p{margin-top:18px}
 /* Contact: a centred heading over two big icon buttons (email, phone). */
-#bw-contact.bw-section{min-height:560px;padding-top:360px;box-sizing:border-box}
+#bw-contact.bw-section{min-height:560px;padding-top:var(--contact-top);box-sizing:border-box}
 .bw-contact-title{font-size:clamp(32px,4vw,44px);font-weight:800;letter-spacing:-0.03em;text-align:center;margin-bottom:40px}
 .bw-contact-btns{display:flex;flex-wrap:wrap;gap:20px;justify-content:center}
 #browse-mode .bw-ibtn{display:inline-flex;align-items:center;justify-content:center;width:136px;height:104px;border-radius:24px;border:1.5px solid var(--ink);box-sizing:border-box;background:transparent;color:var(--ink);text-decoration:none;transition:background .15s,color .15s,transform .15s}
@@ -350,13 +357,10 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   .bw{padding:0 20px}
   .bw-section{padding-top:72px}
   .bw-section:first-child{padding-top:48px}
-  .bw-grid{gap:48px 32px}
   .bw-about p{font-size:17px}
   /* Phones: centred portrait, 160px above it and between it and the text. */
-  #bw-about.bw-section{padding-top:160px}
-  .bw-about{row-gap:160px}
-  .bw-portrait{max-width:300px;margin:0 auto}
-  #bw-contact.bw-section{min-height:420px;padding-top:240px}
+  #browse-mode{--proj-gap-row:48px;--proj-gap-col:32px;--about-top:160px;--about-stack-gap:160px;--portrait-w:300px;--contact-top:240px}
+  #bw-contact.bw-section{min-height:420px}
   .bw-footer{margin-top:72px}
 }
 
