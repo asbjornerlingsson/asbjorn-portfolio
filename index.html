@@ -262,9 +262,9 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #browse-mode{
   --ink:#121315;--muted:#5f636a;--line:#e6e6e9;--surface:#f4f4f5;
   /* Layout spacing (phone values in the 720px block below) */
-  --proj-gap-row:64px;--proj-gap-col:40px;
-  --about-top:320px;--about-stack-gap:48px;--about-side-gap:56px;
-  --portrait-w:280px;--portrait-r:28px;--contact-top:360px;
+  --proj-gap-row:80px;--proj-gap-col:80px;
+  --about-top:240px;--about-stack-gap:100px;--about-side-gap:80px;
+  --portrait-w:280px;--portrait-r:32px;--contact-top:240px;
   font-family:'Inter',Helvetica,Arial,sans-serif;color:var(--ink);
   scroll-behavior:smooth;-webkit-user-select:text;user-select:text;
   /* No scroll anchoring: when the sticky menu folds and gets shorter, the
@@ -359,7 +359,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   .bw-section:first-child{padding-top:48px}
   .bw-about p{font-size:17px}
   /* Phones: centred portrait, 160px above it and between it and the text. */
-  #browse-mode{--proj-gap-row:48px;--proj-gap-col:32px;--about-top:160px;--about-stack-gap:160px;--portrait-w:300px;--contact-top:240px}
+  #browse-mode{--proj-gap-row:80px;--proj-gap-col:32px;--about-top:160px;--about-stack-gap:160px;--about-side-gap:56px;--portrait-w:300px;--portrait-r:28px;--contact-top:240px}
   #bw-contact.bw-section{min-height:420px}
   .bw-footer{margin-top:72px}
 }
@@ -543,7 +543,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 
   <div id="pip-tabs">
     <span class="pip-tab" data-zone="about" role="button" aria-label="About" title="About" onclick="teleportToTab('about')"><span class="pip-tab-lbl">About</span><span class="pip-tab-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.13,10.22Q7.95,9.04 7.95,7.34T9.13,4.47T12,3.29t2.87,1.18t1.18,2.87t-1.18,2.87T12,11.39T9.13,10.22ZM3.75,18.66V17.83q0-0.91 0.45-1.65t1.22-1.12q1.58-0.8 3.24-1.2T12,13.46t3.34,0.4t3.24,1.2q0.77,0.39 1.22,1.12q0.45,0.74 0.45,1.65v0.83q0,0.93-0.62,1.55t-1.55,0.62H5.92q-0.93,0-1.55-0.62T3.75,18.66Z"/></svg></span></span>
-    <span class="pip-tab" data-zone="design" role="button" aria-label="Interfaces &amp; games" title="Interfaces &amp; games" onclick="teleportToTab('design')"><span class="pip-tab-lbl">Interfaces &amp; games</span><span class="pip-tab-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.16,20.25q-1.03,0-1.74-0.72T1.7,17.79V6.21q0-1.03 0.72-1.74T4.16,3.75H19.84q1.03,0 1.74,0.72T22.3,6.21V17.79q0,1.03-0.72,1.74t-1.74,0.72H4.16Zm0-2.15H19.84q0.12,0 0.21-0.1t0.1-0.21V7.9H3.85v9.89q0,0.12 0.1,0.21t0.21,0.1Z"/></svg></span></span>
+    <span class="pip-tab" data-zone="design" role="button" aria-label="UI &amp; games" title="UI &amp; games" onclick="teleportToTab('design')"><span class="pip-tab-lbl">UI &amp; games</span><span class="pip-tab-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.16,20.25q-1.03,0-1.74-0.72T1.7,17.79V6.21q0-1.03 0.72-1.74T4.16,3.75H19.84q1.03,0 1.74,0.72T22.3,6.21V17.79q0,1.03-0.72,1.74t-1.74,0.72H4.16Zm0-2.15H19.84q0.12,0 0.21-0.1t0.1-0.21V7.9H3.85v9.89q0,0.12 0.1,0.21t0.21,0.1Z"/></svg></span></span>
     <span class="pip-tab" data-zone="illustration" role="button" aria-label="Illustration &amp; design" title="Illustration &amp; design" onclick="teleportToTab('illustration')"><span class="pip-tab-lbl">Illustration &amp; design</span><span class="pip-tab-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.14,20.66q-1.01,0-1.96-0.45T2.6,18.97q0.6-0.09 1.2-0.63t0.6-1.48q0-1.15 0.83-1.95t1.98-0.8t1.95,0.8t0.8,1.95q0,1.58-1.11,2.69T6.14,20.66Zm5.61-5.86L9.27,12.32L18.14,3.4q0.28-0.27 0.71-0.29T19.58,3.4l1.08,1.08q0.3,0.3 0.3,0.7t-0.3,0.7L11.75,14.8Z"/></svg></span></span>
     <span class="pip-tab" data-zone="contact" role="button" aria-label="Contact" title="Contact" onclick="teleportToTab('contact')"><span class="pip-tab-lbl">Contact</span><span class="pip-tab-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.16,20.25q-1.03,0-1.74-0.72T1.7,17.79V6.21q0-1.03 0.72-1.74T4.16,3.75H19.84q1.03,0 1.74,0.72T22.3,6.21V17.79q0,1.03-0.72,1.74t-1.74,0.72H4.16Zm8.17-7.38q0.16-0.05 0.3-0.14l7.05-4.51q0.17-0.1 0.29-0.35t0.09-0.49q-0.02-0.48-0.46-0.71T18.72,6.71L12,11L5.28,6.71Q4.83,6.44 4.4,6.65T3.93,7.38Q3.9,7.64 4.02,7.87T4.31,8.22l7.05,4.5q0.15,0.09 0.3,0.14T12,12.92t0.33-0.05Z"/></svg></span></span>
   </div>
@@ -667,7 +667,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 
   <nav class="bw-menu" id="bw-menu" aria-label="Sections">
     <div class="bw-menu-inner">
-        <a class="bw-tab" href="#bw-design" data-section="bw-design" aria-current="true" title="Interfaces &amp; games"><span class="bw-tab-lbl">Interfaces &amp; games</span><span class="bw-tab-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.16,20.25q-1.03,0-1.74-0.72T1.7,17.79V6.21q0-1.03 0.72-1.74T4.16,3.75H19.84q1.03,0 1.74,0.72T22.3,6.21V17.79q0,1.03-0.72,1.74t-1.74,0.72H4.16Zm0-2.15H19.84q0.12,0 0.21-0.1t0.1-0.21V7.9H3.85v9.89q0,0.12 0.1,0.21t0.21,0.1Z"/></svg></span></a>
+        <a class="bw-tab" href="#bw-design" data-section="bw-design" aria-current="true" title="UI &amp; games"><span class="bw-tab-lbl">UI &amp; games</span><span class="bw-tab-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.16,20.25q-1.03,0-1.74-0.72T1.7,17.79V6.21q0-1.03 0.72-1.74T4.16,3.75H19.84q1.03,0 1.74,0.72T22.3,6.21V17.79q0,1.03-0.72,1.74t-1.74,0.72H4.16Zm0-2.15H19.84q0.12,0 0.21-0.1t0.1-0.21V7.9H3.85v9.89q0,0.12 0.1,0.21t0.21,0.1Z"/></svg></span></a>
         <a class="bw-tab" href="#bw-illustration" data-section="bw-illustration" aria-current="false" title="Illustration &amp; design"><span class="bw-tab-lbl">Illustration &amp; design</span><span class="bw-tab-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.14,20.66q-1.01,0-1.96-0.45T2.6,18.97q0.6-0.09 1.2-0.63t0.6-1.48q0-1.15 0.83-1.95t1.98-0.8t1.95,0.8t0.8,1.95q0,1.58-1.11,2.69T6.14,20.66Zm5.61-5.86L9.27,12.32L18.14,3.4q0.28-0.27 0.71-0.29T19.58,3.4l1.08,1.08q0.3,0.3 0.3,0.7t-0.3,0.7L11.75,14.8Z"/></svg></span></a>
         <a class="bw-tab" href="#bw-about" data-section="bw-about" aria-current="false" title="About"><span class="bw-tab-lbl">About</span><span class="bw-tab-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.13,10.22Q7.95,9.04 7.95,7.34T9.13,4.47T12,3.29t2.87,1.18t1.18,2.87t-1.18,2.87T12,11.39T9.13,10.22ZM3.75,18.66V17.83q0-0.91 0.45-1.65t1.22-1.12q1.58-0.8 3.24-1.2T12,13.46t3.34,0.4t3.24,1.2q0.77,0.39 1.22,1.12q0.45,0.74 0.45,1.65v0.83q0,0.93-0.62,1.55t-1.55,0.62H5.92q-0.93,0-1.55-0.62T3.75,18.66Z"/></svg></span></a>
         <a class="bw-tab" href="#bw-contact" data-section="bw-contact" aria-current="false" title="Contact"><span class="bw-tab-lbl">Contact</span><span class="bw-tab-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.16,20.25q-1.03,0-1.74-0.72T1.7,17.79V6.21q0-1.03 0.72-1.74T4.16,3.75H19.84q1.03,0 1.74,0.72T22.3,6.21V17.79q0,1.03-0.72,1.74t-1.74,0.72H4.16Zm8.17-7.38q0.16-0.05 0.3-0.14l7.05-4.51q0.17-0.1 0.29-0.35t0.09-0.49q-0.02-0.48-0.46-0.71T18.72,6.71L12,11L5.28,6.71Q4.83,6.44 4.4,6.65T3.93,7.38Q3.9,7.64 4.02,7.87T4.31,8.22l7.05,4.5q0.15,0.09 0.3,0.14T12,12.92t0.33-0.05Z"/></svg></span></a>
@@ -675,7 +675,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   </nav>
 
   <main class="bw">
-    <section class="bw-section" id="bw-design" aria-label="Interfaces &amp; games">
+    <section class="bw-section" id="bw-design" aria-label="UI &amp; games">
       <div class="bw-grid" id="bw-grid-design"></div>
     </section>
 
@@ -843,7 +843,7 @@ const ZONES=[
 // can set `cover` to pick its card image; otherwise the first still is used.
 // Projects that only appear in the static version (no sign in the game).
 const BROWSE_ONLY_PROJECTS=[];
-// Static version: fills the "Interfaces & games" and "Illustration &
+// Static version: fills the "UI & games" and "Illustration &
 // design" grids, in ZONES order, with the static-only projects last.
 function populateBrowse(){
   var projects=ZONES.filter(function(z){return z.type==='project'}).concat(BROWSE_ONLY_PROJECTS);
