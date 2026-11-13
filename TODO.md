@@ -57,3 +57,4 @@
 - Game on phones: the selected menu button resizes first, then swaps icon for name (and back); pink ◄ ► movement arrows removed (Nov 10).
 - Game on desktop: speech bubbles wrap at a narrower width, so the second intro line is two lines high and no longer covers "PLAYER 1"; the image browser in an expanded project popup is centred vertically against the text (Nov 12).
 - Mode switch: always 22px from the top; in game mode and the static version before the menu sticks it is 22px from the right edge too, and once the menu sticks it slides in to line up with the project cards' right edge (Nov 12).
+- Pixel buttons (`.px-btn`, from the Claude Design handoff) added as a reusable component; project popup "See more"/"See less" use the default style and the eye-strain hint's "Got it" uses the pink one (Nov 13).
