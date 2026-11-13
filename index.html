@@ -70,7 +70,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 @keyframes level-up{0%{opacity:0;transform:translateY(-50%) scale(.6)}8%{opacity:1;transform:translateY(-50%) scale(1.08)}14%{transform:translateY(-50%) scale(1)}20%,32%,44%,56%{opacity:1}26%,38%,50%{opacity:.15}80%{opacity:1}100%{opacity:0;transform:translateY(-50%) scale(1.04)}}
 @media(prefers-reduced-motion:reduce){#level-up.go{animation:level-up-calm 2.6s forwards}@keyframes level-up-calm{0%,85%{opacity:1}100%{opacity:0}}}
 #hud-avatar-frame{width:calc(67px + 31px * var(--rs));height:calc(61px + 27px * var(--rs));overflow:hidden;flex-shrink:0;background-repeat:no-repeat;image-rendering:pixelated}
-/* Keeps the bar clear of the fixed mode-switch toggle (top:40px;right:40px;
+/* Keeps the bar clear of the fixed mode-switch toggle (top:22px;right:22px;
    width:96px) at narrow widths. */
 .hud-bar-track{width:min(calc(80px + 120px * var(--rs)), calc(26vw + 14vw * var(--rs)))}
 
@@ -182,14 +182,99 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .popup-what,.popup-how{font-family:'Share Tech Mono',monospace;font-size:calc(16px + 3px * var(--rs));font-weight:normal;line-height:1.6;color:#050E08;margin-bottom:24px;max-width:720px}
 .popup-tags{display:none}
 .popup-tag{display:none}
-.popup-see-more{
-  display:block;margin:32px auto 0;font-family:'Share Tech Mono',monospace;font-size:16px;
-  color:#050E08;background:#fbfbfb;border:2px solid #050E08;
-  padding:calc(6px + 2px * var(--rs)) calc(24px + 12px * var(--rs));
-  cursor:pointer;letter-spacing:-1.5px;transition:all 0.15s;-webkit-tap-highlight-color:transparent;
+/* ===== Pixel buttons =====
+   Tokens: change these to restyle every button. */
+:root{
+  --btn-font:'Share Tech Mono';
+  --btn-fs:26px;
+  --btn-ls:.01em;
+  --btn-case:none;          /* or uppercase */
+  --btn-h:64px;             /* min height */
+  --btn-pad:40px;           /* left/right padding; width follows the label */
+  --btn-px:3px;             /* pixel unit: border, corner steps, shades */
+  --btn-bevel-w:1.5;        /* dark shade width, in pixel units */
+  --btn-hl-w:1;             /* light shade width, in pixel units */
+  --btn-press-depth:.5;     /* shades shrink to this fraction when pressed */
+
+  --btn-black:#000000;
+  --btn-bevel:#c4c4c4;      /* dark shade, bottom/right */
+  --btn-hl:#e2e2e2;         /* light shade, top/left */
+  --btn-hover:#ebebeb;
+
+  --btn-pink:#FF2889;
+  --btn-pink-bevel:#ffadd0;
+  --btn-pink-hl:#ffd6e8;
+  --btn-pink-hover:#ffe3ef;
 }
-.popup-see-more:hover{background:#050E08;color:white}
-.popup-see-more:active{background:#333;color:white}
+
+/* Layers, back to front:
+   1. the button = border colour (--ink), clipped to the stepped outline
+   2. ::before  = dark shade, same stepped shape, inset one pixel unit
+   3. ::after   = face, same stepped shape, pulled in from right/bottom by the shade width
+                  (so the dark shade shows bottom/right with stepped corners);
+                  its inset shadow draws the light shade top/left. */
+.px-btn{
+  --px:var(--btn-px);
+  --ink:var(--btn-black);
+  --fill:#ffffff;
+  --text:var(--btn-black);
+  --bevel:var(--btn-bevel);
+  --hl:var(--btn-hl);
+  --bw:calc(var(--px) * var(--btn-bevel-w) * var(--depth,1));
+  --hw:calc(var(--px) * var(--btn-hl-w) * var(--depth,1));
+  position:relative;isolation:isolate;
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  min-height:var(--btn-h);padding:0 var(--btn-pad);box-sizing:border-box;
+  font-family:var(--btn-font),sans-serif;font-weight:700;font-size:var(--btn-fs);line-height:1;
+  letter-spacing:var(--btn-ls);text-transform:var(--btn-case);white-space:nowrap;
+  color:var(--text);background:var(--ink);
+  border:0;margin:0;cursor:pointer;text-decoration:none;
+  -webkit-tap-highlight-color:transparent;
+  clip-path:polygon(calc(var(--px) * 2) 0, calc(100% - var(--px) * 2) 0, calc(100% - var(--px) * 2) var(--px), calc(100% - var(--px)) var(--px), calc(100% - var(--px)) calc(var(--px) * 2), 100% calc(var(--px) * 2), 100% calc(100% - var(--px) * 2), calc(100% - var(--px)) calc(100% - var(--px) * 2), calc(100% - var(--px)) calc(100% - var(--px)), calc(100% - var(--px) * 2) calc(100% - var(--px)), calc(100% - var(--px) * 2) 100%, calc(var(--px) * 2) 100%, calc(var(--px) * 2) calc(100% - var(--px)), var(--px) calc(100% - var(--px)), var(--px) calc(100% - var(--px) * 2), 0 calc(100% - var(--px) * 2), 0 calc(var(--px) * 2), var(--px) calc(var(--px) * 2), var(--px) var(--px), calc(var(--px) * 2) var(--px));
+  transition:color .12s ease;
+}
+.px-btn::before,.px-btn::after{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  clip-path:polygon(calc(var(--px) * 2) 0, calc(100% - var(--px) * 2) 0, calc(100% - var(--px) * 2) var(--px), calc(100% - var(--px)) var(--px), calc(100% - var(--px)) calc(var(--px) * 2), 100% calc(var(--px) * 2), 100% calc(100% - var(--px) * 2), calc(100% - var(--px)) calc(100% - var(--px) * 2), calc(100% - var(--px)) calc(100% - var(--px)), calc(100% - var(--px) * 2) calc(100% - var(--px)), calc(100% - var(--px) * 2) 100%, calc(var(--px) * 2) 100%, calc(var(--px) * 2) calc(100% - var(--px)), var(--px) calc(100% - var(--px)), var(--px) calc(100% - var(--px) * 2), 0 calc(100% - var(--px) * 2), 0 calc(var(--px) * 2), var(--px) calc(var(--px) * 2), var(--px) var(--px), calc(var(--px) * 2) var(--px));
+}
+.px-btn::before{inset:var(--px);background:var(--bevel);transition:background-color .12s ease}
+.px-btn::after{
+  top:var(--px);left:var(--px);
+  right:calc(var(--px) + var(--bw));bottom:calc(var(--px) + var(--bw));
+  background:var(--fill);
+  box-shadow:inset var(--hw) var(--hw) 0 var(--hl);
+  transition:background-color .12s ease,box-shadow .08s ease,right .08s ease,bottom .08s ease;
+}
+
+/* Keyboard focus: ring inside the face (clip-path would cut off an outline). */
+.px-btn:focus-visible{outline:none}
+.px-btn:focus-visible::after{box-shadow:inset var(--hw) var(--hw) 0 var(--hl),inset 0 0 0 calc(var(--hw) + 4px) var(--fill),inset 0 0 0 calc(var(--hw) + 6px) currentColor}
+
+/* Pink variant */
+.px-btn--pink{--ink:var(--btn-pink);--text:var(--btn-pink);--bevel:var(--btn-pink-bevel);--hl:var(--btn-pink-hl)}
+
+/* Hover: face one shade darker. Only on real hover devices, so taps don't leave it stuck. */
+@media (hover: hover){
+  .px-btn:hover{--fill:var(--btn-hover)}
+  .px-btn--pink:hover{--fill:var(--btn-pink-hover)}
+}
+
+/* Pressed: face a touch darker, both shades narrower (edges sink in). Nothing moves. */
+.px-btn:active{--fill:color-mix(in srgb, var(--btn-hover), #000 5%);--depth:var(--btn-press-depth)}
+.px-btn--pink:active{--fill:color-mix(in srgb, var(--btn-pink-hover), #000 4%)}
+
+/* Options */
+.px-btn--block{display:flex;width:100%}
+.px-btn--sm{--px:2px;--btn-h:48px;--btn-pad:28px;--btn-fs:20px}
+.px-btn[disabled],.px-btn[aria-disabled="true"]{opacity:.4;pointer-events:none}
+@media (prefers-reduced-motion: reduce){.px-btn,.px-btn::before,.px-btn::after{transition:none}}
+
+/* Where the pixel buttons sit: centred on their own line. */
+/* Same size and font as the earlier buttons: 16px Share Tech Mono, 2px
+   pixel unit, 34-38px tall depending on screen width. */
+.px-btn.popup-see-more{display:flex;width:max-content;margin:32px auto 0;
+  --btn-font:'Share Tech Mono';--btn-fs:16px;--btn-ls:-1.5px;--btn-px:2px;
+  --btn-h:calc(34px + 4px * var(--rs));--btn-pad:calc(26px + 12px * var(--rs));font-weight:400}
 
 /* Mobile touch zones — just visual arrow containers, non-interactive */
 #touch-zone-left,#touch-zone-right{
@@ -432,16 +517,18 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
   position:fixed;top:90px;right:40px;z-index:145;
   width:min(360px,calc(100vw - 32px));box-sizing:border-box;background:#050E08;border:3px solid #FF2889;
   padding:24px 32px;opacity:0;pointer-events:none;
-  transition:opacity 0.4s;font-family:'Share Tech Mono',monospace;
+  transition:opacity 0.4s,right .5s cubic-bezier(.4,0,.2,1);font-family:'Share Tech Mono',monospace;
 }
 #mode-hint.visible{opacity:1;pointer-events:all}
 #mode-hint-text{font-size:16px;line-height:1.6;color:#FF2889;margin-bottom:12px}
-#mode-hint-close{
-  display:block;margin:0 auto;font-family:'Share Tech Mono',monospace;
-  font-size:16px;color:#FF2889;background:transparent;border:2px solid #FF2889;
-  padding:10px 20px;cursor:pointer;transition:all 0.15s;
-}
-#mode-hint-close:hover{background:#FF2889;color:#fbfbfb}
+/* Eye-strain hint: pink pixel button on the hint's dark background (no
+   coloured face), same size and font as the earlier button. */
+#mode-hint-close.px-btn{display:flex;width:max-content;margin:0 auto;
+  --btn-font:'Share Tech Mono';--btn-fs:16px;--btn-ls:normal;--btn-px:2px;--btn-h:42px;--btn-pad:22px;font-weight:400;
+  --fill:#050E08;--bevel:color-mix(in srgb,#FF2889 35%,#050E08);--hl:color-mix(in srgb,#FF2889 18%,#050E08)}
+/* Hover and pressed: pink face, black text (pressed also thins the shades). */
+@media (hover:hover){#mode-hint-close.px-btn:hover{--fill:#FF2889;--text:#050E08;--bevel:color-mix(in srgb,#FF2889 65%,#050E08);--hl:color-mix(in srgb,#FF2889 60%,#fff)}}
+#mode-hint-close.px-btn:active{--fill:#FF2889;--text:#050E08;--bevel:color-mix(in srgb,#FF2889 65%,#050E08);--hl:color-mix(in srgb,#FF2889 60%,#fff)}
 #mode-hint-arrow{
   position:absolute;top:-10px;right:24px;
   width:0;height:0;
@@ -565,7 +652,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
       <div class="popup-title"></div>
       <div class="popup-what-label"></div>
       <div class="popup-what"></div>
-      <button class="popup-see-more" onclick="expandModal()">See more</button>
+      <button type="button" class="px-btn popup-see-more" onclick="expandModal()">See more</button>
     </div>
     <!-- Expanded state -->
     <div id="popup-expanded" style="display:none">
@@ -586,7 +673,7 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
           <div class="popup-image-stack" id="popup-image-stack"></div>
         </div>
       </div>
-      <button class="popup-see-more" onclick="collapseModal()">See less</button>
+      <button type="button" class="px-btn popup-see-more" onclick="collapseModal()">See less</button>
     </div>
   </div>
 
@@ -607,12 +694,12 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
     <div id="mode-hint-arrow"></div>
     <div id="mode-hint-arrow-inner"></div>
     <div id="mode-hint-text">Psst... playing for too long can hurt your eyes. Turn off game mode here.</div>
-    <button id="mode-hint-close" onclick="closeModeHint()">Got it</button>
+    <button type="button" id="mode-hint-close" class="px-btn px-btn--pink" onclick="closeModeHint()">Got it</button>
   </div>
 </div>
 
 <!-- MODE TOGGLE (always visible) -->
-<div id="mode-switch" onclick="toggleMode()" style="position:fixed;top:22px;right:40px;z-index:300;width:96px;height:40px;border-radius:54px;cursor:pointer;pointer-events:all;-webkit-tap-highlight-color:transparent;transition:background 0.25s;background:#FF2889">
+<div id="mode-switch" onclick="toggleMode()" style="position:fixed;top:22px;right:40px;z-index:300;width:96px;height:40px;border-radius:54px;cursor:pointer;pointer-events:all;-webkit-tap-highlight-color:transparent;transition:background 0.25s,right .5s cubic-bezier(.4,0,.2,1);background:#FF2889">
   <div id="mode-switch-knob" style="position:absolute;top:4px;width:32px;height:32px;border-radius:93px;background:white;box-shadow:0 4px 8px rgba(0,0,0,0.08);transition:left 0.25s;left:60px"></div>
   <!-- Game ON icon (white outlined retro controller) -->
   <svg id="mode-icon-on" style="position:absolute;top:5px;left:8px;width:30px;height:30px" viewBox="0 0 30 30" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1018,10 +1105,16 @@ function switchRight(){
   var W=window.innerWidth,pad=W<=720?20:40;
   return Math.round(Math.max(0,(W-1160)/2)+pad);
 }
+// The switch is always 22px from the top. In game mode, and in the static
+// version before the menu sticks, it's as far from the right edge as from
+// the top; once the menu is stuck it slides in to line up with the right
+// edge of the project cards.
 function placeModeSwitch(){
   var sw=document.getElementById('mode-switch');
   if(!sw)return;
-  var right=switchRight();
+  var menu=document.getElementById('bw-menu');
+  var stuck=currentMode==='browse'&&menu&&menu.classList.contains('is-stuck');
+  var right=stuck?switchRight():SWITCH_TOP;
   sw.style.top=SWITCH_TOP+'px';sw.style.right=right+'px';
   var hint=document.getElementById('mode-hint'),arrow=document.getElementById('mode-hint-arrow');
   if(hint&&arrow){
