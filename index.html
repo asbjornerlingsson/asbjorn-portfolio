@@ -270,7 +270,11 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 @media (prefers-reduced-motion: reduce){.px-btn,.px-btn::before,.px-btn::after{transition:none}}
 
 /* Where the pixel buttons sit: centred on their own line. */
-.px-btn.popup-see-more{display:flex;width:max-content;margin:32px auto 0}
+/* Same size and font as the earlier buttons: 16px Share Tech Mono, 2px
+   pixel unit, 34-38px tall depending on screen width. */
+.px-btn.popup-see-more{display:flex;width:max-content;margin:32px auto 0;
+  --btn-font:'Share Tech Mono';--btn-fs:16px;--btn-ls:-1.5px;--btn-px:2px;
+  --btn-h:calc(34px + 4px * var(--rs));--btn-pad:calc(26px + 12px * var(--rs));font-weight:400}
 
 /* Mobile touch zones — just visual arrow containers, non-interactive */
 #touch-zone-left,#touch-zone-right{
@@ -517,7 +521,13 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 }
 #mode-hint.visible{opacity:1;pointer-events:all}
 #mode-hint-text{font-size:16px;line-height:1.6;color:#FF2889;margin-bottom:12px}
-#mode-hint-close.px-btn{display:flex;width:max-content;margin:0 auto}
+/* Eye-strain hint: pink pixel button on the hint's dark background (no
+   coloured face), same size and font as the earlier button. */
+#mode-hint-close.px-btn{display:flex;width:max-content;margin:0 auto;
+  --btn-font:'Share Tech Mono';--btn-fs:16px;--btn-ls:normal;--btn-px:2px;--btn-h:42px;--btn-pad:22px;font-weight:400;
+  --fill:#050E08;--bevel:color-mix(in srgb,#FF2889 35%,#050E08);--hl:color-mix(in srgb,#FF2889 18%,#050E08)}
+@media (hover:hover){#mode-hint-close.px-btn:hover{--fill:color-mix(in srgb,#FF2889 12%,#050E08)}}
+#mode-hint-close.px-btn:active{--fill:color-mix(in srgb,#FF2889 8%,#050E08)}
 #mode-hint-arrow{
   position:absolute;top:-10px;right:24px;
   width:0;height:0;
